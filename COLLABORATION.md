@@ -37,7 +37,7 @@ REPORTS_ENABLED=false
 ```bash
 npm run dev
 # Ouvrir http://localhost:3000
-# Login: admin / password123 (pour utilisateurs importés)
+# Login: admin / admin123
 ```
 
 ---
