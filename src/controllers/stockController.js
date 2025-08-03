@@ -95,6 +95,9 @@ exports.createOrUpdateStock = async (req, res) => {
 // Obtenir tous les stocks
 exports.getAllStocks = async (req, res) => {
   try {
+    console.log('🔍 [STOCK API] getAllStocks appelé');
+    console.log('📥 [STOCK API] Query params:', req.query);
+    
     const query = {};
     const { companyId } = req.query || {};
     
@@ -124,6 +127,9 @@ exports.getAllStocks = async (req, res) => {
       barInclude.where = { companyId };
     }
     
+    console.log('📊 [STOCK API] Requête WHERE:', query);
+    console.log('📊 [STOCK API] Company filter:', companyId);
+    
     const stocks = await Stock.findAll({
       where: query,
       include: [
@@ -139,6 +145,23 @@ exports.getAllStocks = async (req, res) => {
       order: [['id', 'ASC']]
     });
     
+    console.log(`✅ [STOCK API] ${stocks.length} stocks trouvés`);
+    if (stocks.length > 0) {
+      const firstStock = stocks[0];
+      console.log('🔍 [STOCK API] Premier stock structure:', {
+        id: firstStock.id,
+        barId: firstStock.barId,
+        hasProduct: !!firstStock.Product,
+        productName: firstStock.Product?.name,
+        hasFormat: !!firstStock.Format,
+        formatSize: firstStock.Format?.size,
+        hasBar: !!firstStock.Bar,
+        barName: firstStock.Bar?.name
+      });
+    }
+    
+    console.log('📤 [STOCK API] Envoi réponse 200 OK');
+    
     return res.status(200).json({
       success: true,
       count: stocks.length,
@@ -146,7 +169,8 @@ exports.getAllStocks = async (req, res) => {
     });
     
   } catch (error) {
-    console.error(error);
+    console.error('❌ [STOCK API] ERREUR dans getAllStocks:', error.message);
+    console.error('❌ [STOCK API] Stack trace:', error.stack);
     return res.status(500).json({
       success: false,
       message: "Erreur lors de la récupération des stocks",
@@ -333,6 +357,9 @@ exports.updateStockQuantity = async (req, res) => {
 // Obtenir les stocks à réapprovisionner par bar
 exports.getStocksToRestock = async (req, res) => {
   try {
+    console.log('🔍 [RESTOCK API] getStocksToRestock appelé');
+    console.log('📥 [RESTOCK API] Params:', req.params);
+    
     const { barId } = req.params;
     
     // Vérifier si le bar existe
