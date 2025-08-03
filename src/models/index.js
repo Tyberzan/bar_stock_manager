@@ -29,6 +29,10 @@ Stock.belongsTo(Bar, { foreignKey: 'barId' });
 Format.hasMany(Stock, { foreignKey: 'formatId', onDelete: 'CASCADE' });
 Stock.belongsTo(Format, { foreignKey: 'formatId' });
 
+// Product <-> Stock (un produit peut être stocké dans plusieurs bars)
+Product.hasMany(Stock, { foreignKey: 'productId', onDelete: 'CASCADE' });
+Stock.belongsTo(Product, { foreignKey: 'productId' });
+
 // Stock <-> StockHistory (un stock a un historique)
 Stock.hasMany(StockHistory, { foreignKey: 'stockId', onDelete: 'CASCADE' });
 StockHistory.belongsTo(Stock, { foreignKey: 'stockId' });

@@ -342,12 +342,12 @@ exports.getStocksToRestock = async (req, res) => {
       });
     }
     
-    // Trouver tous les stocks où currentQuantity < minQuantity
+    // Trouver tous les stocks où currentQuantity < minThreshold
     const stocksToRestock = await Stock.findAll({
       where: {
         barId,
         currentQuantity: {
-          [Op.lt]: sequelize.col('minQuantity')
+          [Op.lt]: sequelize.col('minThreshold')
         }
       },
       include: [
@@ -358,7 +358,7 @@ exports.getStocksToRestock = async (req, res) => {
         Bar
       ],
       order: [
-        [sequelize.literal('(minQuantity - currentQuantity)'), 'DESC']  // Trier par quantité manquante
+        [sequelize.literal('(minThreshold - currentQuantity)'), 'DESC']  // Trier par quantité manquante
       ]
     });
     
@@ -524,7 +524,7 @@ exports.generateRestockReport = async (req, res) => {
     
     // Récupérer les stocks à réapprovisionner (quantité actuelle < quantité minimale)
     const stocksToRestock = allStocks.filter(stock => 
-      stock.currentQuantity < stock.minQuantity
+      stock.currentQuantity < stock.minThreshold
     );
     
     // Organiser les produits par catégorie

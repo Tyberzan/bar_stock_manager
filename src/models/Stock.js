@@ -23,22 +23,30 @@ const Stock = sequelize.define('Stock', {
       key: 'id'
     }
   },
+  productId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Products',
+      key: 'id'
+    }
+  },
   currentQuantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
   },
-  minQuantity: {
+  minThreshold: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 10,
     // Seuil d'alerte pour le réapprovisionnement
   },
-  idealQuantity: {
+  maxThreshold: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 30,
-    // Quantité idéale à avoir en stock
+    // Quantité maximale recommandée en stock
   }
 }, {
   timestamps: true
