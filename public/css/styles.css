@@ -1,0 +1,372 @@
+/* Styles généraux */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eaecef;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+/* Tableau */
+.table {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+}
+
+/* Badges et status */
+.badge {
+  padding: 6px 10px;
+  font-weight: 500;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Formulaires */
+.form-control, .form-select {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 10px 12px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Modals */
+.modal-content {
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eaecef;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #eaecef;
+}
+
+/* Actions buttons */
+.action-btn {
+  margin-right: 5px;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .card {
+    margin-bottom: 15px;
+  }
+  
+  .table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+}
+
+/* Dashboard cards */
+.dashboard-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.dashboard-card .card-title {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.dashboard-card .card-text {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+/* Alert notifications */
+.alert {
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+}
+
+/* Custom progress bar for stock levels */
+.stock-progress {
+  height: 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.stock-low {
+  background-color: #dc3545;
+}
+
+.stock-medium {
+  background-color: #ffc107;
+}
+
+.stock-good {
+  background-color: #28a745;
+}
+
+/* Styles responsives pour les appareils mobiles */
+@media (max-width: 768px) {
+  /* Ajustements généraux */
+  .container {
+    padding: 10px;
+  }
+  
+  .card {
+    margin-bottom: 15px;
+  }
+  
+  .table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Navigation */
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  
+  .navbar-toggler {
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .navbar-collapse {
+    background-color: #343a40;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  
+  .nav-link {
+    padding: 8px 0;
+  }
+  
+  /* Tableaux */
+  .table th, .table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .table thead {
+    display: none;
+  }
+  
+  .table tbody tr {
+    display: block;
+    margin-bottom: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+  }
+  
+  .table tbody td {
+    display: block;
+    text-align: right;
+    padding: 8px;
+    position: relative;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .table tbody td:last-child {
+    border-bottom: none;
+  }
+  
+  .table tbody td:before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+  }
+  
+  /* Formulaires */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-label {
+    font-size: 0.9rem;
+  }
+  
+  .form-control, .form-select {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+  
+  /* Boutons */
+  .btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .btn-sm {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Modals */
+  .modal-dialog {
+    margin: 10px;
+  }
+  
+  .modal-content {
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    padding: 10px 15px;
+  }
+  
+  .modal-body {
+    padding: 15px;
+  }
+  
+  .modal-footer {
+    padding: 10px 15px;
+  }
+  
+  /* Dashboard */
+  .dashboard-card .card-text {
+    font-size: 1.5rem;
+  }
+  
+  /* Accordéon */
+  .accordion-button {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .accordion-body {
+    padding: 15px;
+  }
+  
+  /* Alerts */
+  .alert {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+  
+  /* Badges */
+  .badge {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+  
+  /* Progress bars */
+  .stock-progress {
+    height: 8px;
+  }
+  
+  /* Actions dans les tableaux */
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 5px;
+  }
+  
+  .action-btn {
+    margin-right: 5px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+  
+  /* Ajustements pour les formulaires complexes */
+  .row > [class*="col-"] {
+    padding: 0 5px;
+  }
+  
+  /* Ajustements pour les sélecteurs */
+  .form-select {
+    background-position: right 5px center;
+  }
+  
+  /* Ajustements pour les inputs group */
+  .input-group {
+    flex-wrap: nowrap;
+  }
+  
+  .input-group-text {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* Ajustements pour les tooltips */
+  .tooltip {
+    font-size: 0.8rem;
+  }
+  
+  /* Ajustements pour les popovers */
+  .popover {
+    max-width: 250px;
+  }
+  
+  .popover-body {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Animation pour les mises à jour de lignes */
+.highlight-update {
+  animation: highlight-row 2s ease-in-out;
+}
+
+@keyframes highlight-row {
+  0% { background-color: rgba(0, 123, 255, 0.1); }
+  50% { background-color: rgba(0, 123, 255, 0.2); }
+  100% { background-color: transparent; }
+} 
