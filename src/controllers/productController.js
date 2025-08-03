@@ -36,12 +36,12 @@ exports.getAllProducts = async (req, res) => {
     const query = {};
     
     // Filtre par catégorie si spécifié
-    if (req.query.category) {
+    if (req.query && req.query.category) {
       query.category = req.query.category;
     }
     
     // Filtre par état actif/inactif si spécifié
-    if (req.query.isActive !== undefined) {
+    if (req.query && req.query.isActive !== undefined) {
       query.isActive = req.query.isActive === 'true';
     }
     

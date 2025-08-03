@@ -96,15 +96,15 @@ exports.createOrUpdateStock = async (req, res) => {
 exports.getAllStocks = async (req, res) => {
   try {
     const query = {};
-    const { companyId } = req.query;
+    const { companyId } = req.query || {};
     
     // Filtre par barId si spécifié
-    if (req.query.barId) {
+    if (req.query && req.query.barId) {
       query.barId = req.query.barId;
     }
     
     // Filtre par formatId si spécifié
-    if (req.query.formatId) {
+    if (req.query && req.query.formatId) {
       query.formatId = req.query.formatId;
     }
     

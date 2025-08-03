@@ -54,7 +54,7 @@ exports.createBar = async (req, res) => {
 // Obtenir tous les bars
 exports.getAllBars = async (req, res) => {
   try {
-    const { companyId } = req.query;
+    const { companyId } = req.query || {};
     
     const whereClause = {};
     if (companyId) {
