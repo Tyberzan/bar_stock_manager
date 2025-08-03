@@ -131,6 +131,9 @@ exports.getAllStocks = async (req, res) => {
           model: Format,
           include: [Product]
         },
+        {
+          model: Product
+        },
         barInclude
       ],
       order: [['id', 'ASC']]
