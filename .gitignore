@@ -47,8 +47,14 @@ coverage/
 exports/*.xlsx
 exports/*.csv
 
+# Exports de base partagés (garder le dernier)
+# exports/database-export-*.json
+
 # Debug files
 login-debug.html
+
+# Configuration exemple
+# .env.example est géré par Git
 
 # Cache
 .cache/
