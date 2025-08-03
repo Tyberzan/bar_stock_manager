@@ -1,0 +1,321 @@
+{
+  "timestamp": "2025-08-03T16:00:49.795Z",
+  "version": "1.0.0",
+  "description": "Export Bar Stock Manager pour collaboration",
+  "data": {
+    "companies": [
+      {
+        "id": 1,
+        "name": "Restaurant Le Gourmet",
+        "address": "123 Rue de la Paix, 75001 Paris",
+        "phone": "01 23 45 67 89",
+        "email": "contact@legourmet.fr",
+        "isActive": 1,
+        "inviteCode": "25D98B7272511FBE",
+        "createdAt": "2025-07-01 03:57:45.545 +00:00",
+        "updatedAt": "2025-07-31 13:07:38.552 +00:00"
+      },
+      {
+        "id": 2,
+        "name": "PoneyClub",
+        "address": "123 Route des Écuries, 75000 Paris",
+        "phone": "01 23 45 67 89",
+        "email": "contact@poneyclub.fr",
+        "isActive": 1,
+        "inviteCode": "C9A3FC417CEA8BFF",
+        "createdAt": "2025-07-01 04:24:47.953 +00:00",
+        "updatedAt": "2025-07-31 13:07:38.559 +00:00"
+      },
+      {
+        "id": 3,
+        "name": "La voile Blanche",
+        "address": "10 ch bedet 31370 Bérat",
+        "phone": "0652302619",
+        "email": "roman.lerat@gmail.com",
+        "isActive": 1,
+        "inviteCode": "86C448520191D71F",
+        "createdAt": "2025-07-20 09:41:49.829 +00:00",
+        "updatedAt": "2025-07-31 13:07:38.563 +00:00"
+      },
+      {
+        "id": 4,
+        "name": "Test Enterprise Roman",
+        "address": "123 Test Street",
+        "phone": null,
+        "email": "test@romanenterprise.com",
+        "isActive": 1,
+        "inviteCode": "5E94215E1444FE84",
+        "createdAt": "2025-07-31 13:25:44.398 +00:00",
+        "updatedAt": "2025-07-31 13:25:44.398 +00:00"
+      },
+      {
+        "id": 5,
+        "name": "lulul",
+        "address": "lulu 31",
+        "phone": "0652302619",
+        "email": "roman.lerat@gmail.com",
+        "isActive": 1,
+        "inviteCode": null,
+        "createdAt": "2025-07-31 13:33:27.156 +00:00",
+        "updatedAt": "2025-07-31 13:33:27.156 +00:00"
+      }
+    ],
+    "bars": [
+      {
+        "id": 1,
+        "name": "Bar Principal",
+        "location": "Rez-de-chaussée",
+        "description": null,
+        "companyId": null,
+        "isActive": 1,
+        "createdAt": "2025-07-01 03:57:45.557 +00:00",
+        "updatedAt": "2025-07-01 03:57:45.557 +00:00"
+      },
+      {
+        "id": 2,
+        "name": "Bar Lounge Restaurant Le Gourmet",
+        "location": "Premier étage",
+        "description": null,
+        "companyId": null,
+        "isActive": 1,
+        "createdAt": "2025-07-01 03:57:45.557 +00:00",
+        "updatedAt": "2025-07-01 04:57:35.821 +00:00"
+      },
+      {
+        "id": 3,
+        "name": "Bar Terrasse",
+        "location": "Terrasse principale",
+        "description": null,
+        "companyId": null,
+        "isActive": 1,
+        "createdAt": "2025-07-01 04:24:47.966 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.966 +00:00"
+      },
+      {
+        "id": 4,
+        "name": "Bar Écurie",
+        "location": "Près des écuries",
+        "description": null,
+        "companyId": null,
+        "isActive": 1,
+        "createdAt": "2025-07-01 04:24:47.966 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.966 +00:00"
+      },
+      {
+        "id": 5,
+        "name": "Bar Réception",
+        "location": "Salle de réception",
+        "description": null,
+        "companyId": null,
+        "isActive": 1,
+        "createdAt": "2025-07-01 04:24:47.966 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.966 +00:00"
+      },
+      {
+        "id": 6,
+        "name": "Bar Lounge",
+        "location": "Premier étage PoneyClub",
+        "description": null,
+        "companyId": null,
+        "isActive": 1,
+        "createdAt": "2025-07-01 04:57:35.831 +00:00",
+        "updatedAt": "2025-07-01 04:57:35.831 +00:00"
+      }
+    ],
+    "products": [
+      {
+        "id": 1,
+        "name": "Coca-Cola",
+        "brand": "Coca-Cola",
+        "category": "soft",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 03:57:45.564 +00:00",
+        "updatedAt": "2025-07-01 03:57:45.564 +00:00"
+      },
+      {
+        "id": 2,
+        "name": "Heineken",
+        "brand": "Heineken",
+        "category": "beer",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 03:57:45.564 +00:00",
+        "updatedAt": "2025-07-01 03:57:45.564 +00:00"
+      },
+      {
+        "id": 3,
+        "name": "Coca-Cola",
+        "brand": null,
+        "category": "soda",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:24:47.977 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.977 +00:00"
+      },
+      {
+        "id": 4,
+        "name": "Heineken",
+        "brand": null,
+        "category": "biere",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:24:47.977 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.977 +00:00"
+      },
+      {
+        "id": 5,
+        "name": "Smirnoff Vodka",
+        "brand": null,
+        "category": "spiritueux",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:24:47.977 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.977 +00:00"
+      },
+      {
+        "id": 6,
+        "name": "Perrier",
+        "brand": null,
+        "category": "eau",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:24:47.977 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.977 +00:00"
+      },
+      {
+        "id": 7,
+        "name": "Jack Daniel's",
+        "brand": null,
+        "category": "spiritueux",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:24:47.977 +00:00",
+        "updatedAt": "2025-07-01 04:24:47.977 +00:00"
+      },
+      {
+        "id": 8,
+        "name": "Caporal Brune",
+        "brand": null,
+        "category": "biere",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:52:38.653 +00:00",
+        "updatedAt": "2025-07-01 04:52:38.653 +00:00"
+      },
+      {
+        "id": 9,
+        "name": "Coca Zéro",
+        "brand": null,
+        "category": "soda",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:52:38.673 +00:00",
+        "updatedAt": "2025-07-01 04:52:38.673 +00:00"
+      },
+      {
+        "id": 10,
+        "name": "Pastis 51",
+        "brand": null,
+        "category": "spiritueux",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:52:38.690 +00:00",
+        "updatedAt": "2025-07-01 04:52:38.690 +00:00"
+      },
+      {
+        "id": 11,
+        "name": "Whisky Chivas",
+        "brand": null,
+        "category": "spiritueux",
+        "isActive": 1,
+        "notes": null,
+        "createdAt": "2025-07-01 04:52:38.707 +00:00",
+        "updatedAt": "2025-07-01 04:52:38.707 +00:00"
+      }
+    ],
+    "formats": [],
+    "stocks": [],
+    "reserves": [],
+    "reserveStocks": [],
+    "users": [
+      {
+        "id": 2,
+        "username": "admin",
+        "email": "admin@legourmet.fr",
+        "role": "admin",
+        "companyId": null,
+        "barId": null,
+        "firstName": null,
+        "lastName": null,
+        "phone": null,
+        "lastLogin": "2025-08-03 15:59:14.179 +00:00",
+        "isActive": 1,
+        "createdAt": "2025-07-01 04:10:12.892 +00:00",
+        "updatedAt": "2025-08-03 15:59:14.185 +00:00"
+      },
+      {
+        "id": 3,
+        "username": "superadmin",
+        "email": "superadmin@barstock.com",
+        "role": "superuser",
+        "companyId": null,
+        "barId": null,
+        "firstName": "Super",
+        "lastName": "Administrateur",
+        "phone": null,
+        "lastLogin": null,
+        "isActive": 1,
+        "createdAt": "2025-07-01 05:16:47.424 +00:00",
+        "updatedAt": "2025-07-01 05:16:47.424 +00:00"
+      },
+      {
+        "id": 4,
+        "username": "testuser",
+        "email": "test@example.com",
+        "role": "user",
+        "companyId": null,
+        "barId": null,
+        "firstName": null,
+        "lastName": null,
+        "phone": null,
+        "lastLogin": "2025-07-31 02:15:10.539 +00:00",
+        "isActive": 1,
+        "createdAt": "2025-07-31 02:15:02.648 +00:00",
+        "updatedAt": "2025-07-31 02:15:10.540 +00:00"
+      },
+      {
+        "id": 5,
+        "username": "testuser2",
+        "email": "test2@example.com",
+        "role": "user",
+        "companyId": null,
+        "barId": null,
+        "firstName": null,
+        "lastName": null,
+        "phone": null,
+        "lastLogin": "2025-07-31 02:16:15.581 +00:00",
+        "isActive": 1,
+        "createdAt": "2025-07-31 02:16:15.475 +00:00",
+        "updatedAt": "2025-07-31 02:16:15.581 +00:00"
+      },
+      {
+        "id": 6,
+        "username": "romantest",
+        "email": "roman.test@gmail.com",
+        "role": "admin",
+        "companyId": 4,
+        "barId": null,
+        "firstName": "Roman",
+        "lastName": "Lerat",
+        "phone": null,
+        "lastLogin": null,
+        "isActive": 1,
+        "createdAt": "2025-07-31 13:25:44.402 +00:00",
+        "updatedAt": "2025-07-31 13:25:44.402 +00:00"
+      }
+    ],
+    "stockHistory": [],
+    "reserveTransfers": []
+  }
+}
