@@ -116,12 +116,8 @@ async function importDatabase(filepath) {
     await ReserveStock.bulkCreate(data.data.reserveStocks);
     
     console.log('📥 Import des utilisateurs...');
-    // Ajouter un mot de passe par défaut pour les utilisateurs importés
-    const usersWithPassword = data.data.users.map(user => ({
-      ...user,
-      password: '$2b$10$rQ1.3K7O5vQ1.3K7O5vQ1.RQ1.3K7O5vQ1.3K7O5vQ1.3K7O5vQ1.' // "password123" hashé
-    }));
-    await User.bulkCreate(usersWithPassword);
+    // Garder les mots de passe hashés de l'export (ils sont corrects maintenant)
+    await User.bulkCreate(data.data.users);
     
     console.log('📥 Import de l\'historique...');
     await StockHistory.bulkCreate(data.data.stockHistory);
@@ -130,7 +126,7 @@ async function importDatabase(filepath) {
     await ReserveTransfer.bulkCreate(data.data.reserveTransfers);
     
     console.log('✅ Import terminé avec succès !');
-    console.log('🔑 Mot de passe par défaut pour tous les utilisateurs: password123');
+    console.log('🔑 Identifiants de connexion: admin / admin123');
     
   } catch (error) {
     console.error('❌ Erreur import:', error);

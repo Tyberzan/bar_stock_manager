@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-03T16:09:29.911Z",
+  "timestamp": "2025-08-03T16:33:47.557Z",
   "version": "1.0.0",
   "description": "Export Bar Stock Manager pour collaboration",
   "data": {
@@ -240,36 +240,6 @@
     "reserveStocks": [],
     "users": [
       {
-        "id": 2,
-        "username": "admin",
-        "email": "admin@legourmet.fr",
-        "role": "admin",
-        "companyId": null,
-        "barId": null,
-        "firstName": null,
-        "lastName": null,
-        "phone": null,
-        "lastLogin": "2025-08-03 15:59:14.179 +00:00",
-        "isActive": 1,
-        "createdAt": "2025-07-01 04:10:12.892 +00:00",
-        "updatedAt": "2025-08-03 15:59:14.185 +00:00"
-      },
-      {
-        "id": 3,
-        "username": "superadmin",
-        "email": "superadmin@barstock.com",
-        "role": "superuser",
-        "companyId": null,
-        "barId": null,
-        "firstName": "Super",
-        "lastName": "Administrateur",
-        "phone": null,
-        "lastLogin": null,
-        "isActive": 1,
-        "createdAt": "2025-07-01 05:16:47.424 +00:00",
-        "updatedAt": "2025-07-01 05:16:47.424 +00:00"
-      },
-      {
         "id": 4,
         "username": "testuser",
         "email": "test@example.com",
@@ -313,6 +283,36 @@
         "isActive": 1,
         "createdAt": "2025-07-31 13:25:44.402 +00:00",
         "updatedAt": "2025-07-31 13:25:44.402 +00:00"
+      },
+      {
+        "id": 8,
+        "username": "superadmin",
+        "email": "superadmin@barstock.com",
+        "role": "superuser",
+        "companyId": null,
+        "barId": null,
+        "firstName": "Super",
+        "lastName": "Admin",
+        "phone": null,
+        "lastLogin": null,
+        "isActive": 1,
+        "createdAt": "2025-08-03 16:33:15.326 +00:00",
+        "updatedAt": "2025-08-03 16:33:15.326 +00:00"
+      },
+      {
+        "id": 9,
+        "username": "admin",
+        "email": "admin@barstock.com",
+        "role": "admin",
+        "companyId": null,
+        "barId": null,
+        "firstName": "Admin",
+        "lastName": "System",
+        "phone": null,
+        "lastLogin": null,
+        "isActive": 1,
+        "createdAt": "2025-08-03 16:33:41",
+        "updatedAt": "2025-08-03 16:33:41"
       }
     ],
     "stockHistory": [],
