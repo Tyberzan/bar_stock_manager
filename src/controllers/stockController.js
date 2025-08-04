@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 // Créer ou mettre à jour un stock
 exports.createOrUpdateStock = async (req, res) => {
   try {
-    const { barId, formatId, currentQuantity, minQuantity, idealQuantity } = req.body;
+    const { barId, formatId, currentQuantity, minQuantity, idealQuantity, minThreshold, maxThreshold } = req.body;
     
     // Vérifier si le bar existe
     const bar = await Bar.findByPk(barId);
@@ -42,8 +42,8 @@ exports.createOrUpdateStock = async (req, res) => {
       // Mettre à jour le stock existant
       stock = await stock.update({
         currentQuantity: currentQuantity !== undefined ? currentQuantity : stock.currentQuantity,
-        minQuantity: minQuantity !== undefined ? minQuantity : stock.minQuantity,
-        idealQuantity: idealQuantity !== undefined ? idealQuantity : stock.idealQuantity
+        minThreshold: minThreshold !== undefined ? minThreshold : (minQuantity !== undefined ? minQuantity : stock.minThreshold),
+        maxThreshold: maxThreshold !== undefined ? maxThreshold : (idealQuantity !== undefined ? idealQuantity : stock.maxThreshold)
       });
       
       message = "Stock mis à jour avec succès";
@@ -53,8 +53,8 @@ exports.createOrUpdateStock = async (req, res) => {
         barId,
         formatId,
         currentQuantity: currentQuantity || 0,
-        minQuantity: minQuantity || 10,
-        idealQuantity: idealQuantity || 30
+        minThreshold: minThreshold || minQuantity || 10,
+        maxThreshold: maxThreshold || idealQuantity || 30
       });
       
       message = "Stock créé avec succès";
@@ -407,7 +407,7 @@ exports.initializeBarStocks = async (req, res) => {
     // Traiter chaque stock en séquence
     for (const stockData of stocks) {
       try {
-        const { formatId, currentQuantity, minQuantity, idealQuantity } = stockData;
+        const { formatId, currentQuantity, minQuantity, idealQuantity, minThreshold, maxThreshold } = stockData;
         
         // Vérifier si le format existe
         const format = await Format.findByPk(formatId, {
@@ -434,8 +434,8 @@ exports.initializeBarStocks = async (req, res) => {
           // Mettre à jour le stock existant
           stock = await stock.update({
             currentQuantity: currentQuantity !== undefined ? currentQuantity : stock.currentQuantity,
-            minQuantity: minQuantity !== undefined ? minQuantity : stock.minQuantity,
-            idealQuantity: idealQuantity !== undefined ? idealQuantity : stock.idealQuantity
+            minThreshold: minThreshold !== undefined ? minThreshold : (minQuantity !== undefined ? minQuantity : stock.minThreshold),
+            maxThreshold: maxThreshold !== undefined ? maxThreshold : (idealQuantity !== undefined ? idealQuantity : stock.maxThreshold)
           });
         } else {
           // Créer un nouveau stock
@@ -443,8 +443,8 @@ exports.initializeBarStocks = async (req, res) => {
             barId,
             formatId,
             currentQuantity: currentQuantity || 0,
-            minQuantity: minQuantity || 10,
-            idealQuantity: idealQuantity || 30
+            minThreshold: minThreshold || minQuantity || 10,
+            maxThreshold: maxThreshold || idealQuantity || 30
           });
         }
         

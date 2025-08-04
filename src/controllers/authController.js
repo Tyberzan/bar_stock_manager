@@ -3,7 +3,13 @@ const { User, Company, Bar, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const crypto = require('crypto');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error('CRITICAL ERROR: JWT_SECRET environment variable is not set!');
+  console.error('Please set a strong JWT_SECRET in your environment variables.');
+  process.exit(1);
+}
 const JWT_EXPIRES_IN = '24h';
 
 // Inscription d'un nouvel utilisateur
