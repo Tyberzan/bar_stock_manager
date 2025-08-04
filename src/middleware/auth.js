@@ -1,7 +1,13 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error('CRITICAL ERROR: JWT_SECRET environment variable is not set!');
+  console.error('Please set a strong JWT_SECRET in your environment variables.');
+  process.exit(1);
+}
 
 // Middleware pour vérifier le token JWT
 exports.protect = async (req, res, next) => {
