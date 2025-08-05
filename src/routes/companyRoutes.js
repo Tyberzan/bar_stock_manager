@@ -3,9 +3,9 @@ const router = express.Router();
 const companyController = require('../controllers/companyController');
 const { protect, authorize } = require('../middleware/auth');
 
-// Routes publiques
-router.get('/', companyController.getAllCompanies);
-router.get('/:id', companyController.getCompanyById);
+// Routes protégées - nécessitent l'authentification pour le filtrage par rôle
+router.get('/', protect, companyController.getAllCompanies);
+router.get('/:id', protect, companyController.getCompanyById);
 
 // Routes protégées pour les administrateurs
 router.post('/', protect, authorize('admin'), companyController.createCompany);
