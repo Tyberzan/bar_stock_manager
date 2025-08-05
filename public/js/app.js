@@ -303,16 +303,14 @@ async function loadDashboardData() {
     let barsUrl = '/bars';
     let stocksUrl = '/stocks';
     
-    // Pour les admins, ne pas filtrer par défaut (sauf si explicitement sélectionné)
-    const currentUser = localStorage.getItem('user');
-    const user = currentUser ? JSON.parse(currentUser) : null;
-    
-    if (selectedCompanyId && !(user && user.role === 'admin' && !selectedCompanyId)) {
+    // Ajouter le filtre d'entreprise si une entreprise spécifique est sélectionnée
+    if (selectedCompanyId) {
       barsUrl += `?companyId=${selectedCompanyId}`;
       stocksUrl += `?companyId=${selectedCompanyId}`;
     }
     
     // Charger toutes les données en parallèle
+    // Note: Le backend filtre automatiquement selon les permissions de l'utilisateur
     const [barsResponse, productsResponse, stocksResponse, companiesResponse] = await Promise.all([
       fetchWithAuth(barsUrl),
       fetchWithAuth('/products'),
@@ -2028,21 +2026,45 @@ async function loadCompanySelector() {
     const response = await fetchWithAuth('/companies');
     if (response && response.success) {
       const companies = response.data.filter(company => company.isActive);
+      const currentUser = localStorage.getItem('user');
+      const user = currentUser ? JSON.parse(currentUser) : null;
       
       // Afficher le sélecteur s'il y a des entreprises
       const selectorContainer = document.getElementById('company-selector-container');
       if (selectorContainer && companies.length > 0) {
-        selectorContainer.classList.remove('d-none');
+        
+        // Pour les superusers : afficher le sélecteur avec option "Toutes les entreprises"
+        // Pour les autres : masquer le sélecteur s'il n'y a qu'une seule entreprise
+        if (user && user.role === 'superuser') {
+          selectorContainer.classList.remove('d-none');
+        } else if (companies.length > 1) {
+          selectorContainer.classList.remove('d-none');
+        } else {
+          // Une seule entreprise pour un non-superuser : pas besoin de sélecteur
+          selectorContainer.classList.add('d-none');
+        }
         
         // Peupler le menu déroulant
         const dropdownMenu = document.getElementById('company-dropdown-menu');
         if (dropdownMenu) {
-          // Garder l'option "Toutes les entreprises"
-          const allOption = dropdownMenu.querySelector('[data-company-id=""]');
           dropdownMenu.innerHTML = '';
-          if (allOption) {
-            dropdownMenu.appendChild(allOption);
-            dropdownMenu.appendChild(document.createElement('hr')).className = 'dropdown-divider';
+          
+          // Ajouter l'option "Toutes les entreprises" SEULEMENT pour les superusers
+          if (user && user.role === 'superuser') {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.className = 'dropdown-item';
+            a.href = '#';
+            a.setAttribute('data-company-id', '');
+            a.innerHTML = `<i class="bi bi-building me-2"></i>Toutes les entreprises`;
+            li.appendChild(a);
+            dropdownMenu.appendChild(li);
+            
+            if (companies.length > 0) {
+              const hr = document.createElement('li');
+              hr.innerHTML = '<hr class="dropdown-divider">';
+              dropdownMenu.appendChild(hr);
+            }
           }
           
           companies.forEach(company => {
@@ -2058,19 +2080,16 @@ async function loadCompanySelector() {
         }
       }
       
-      // Pour les admins, afficher "Toutes les entreprises" par défaut
-      const currentUser = localStorage.getItem('user');
-      const user = currentUser ? JSON.parse(currentUser) : null;
-      
-      if (user && user.role === 'admin') {
-        // Admin : voir toutes les entreprises par défaut
+      // Logique de sélection par défaut selon le rôle
+      if (user && user.role === 'superuser') {
+        // Superuser : voir toutes les entreprises par défaut
         selectCompany(null);
-      } else {
-        // Autres utilisateurs : restaurer la sélection précédente
-        const savedCompanyId = localStorage.getItem('selectedCompanyId');
-        if (savedCompanyId && companies.find(c => c.id == savedCompanyId)) {
-          selectCompany(savedCompanyId);
-        }
+      } else if (companies.length === 1) {
+        // Un seul choix : sélectionner automatiquement
+        selectCompany(companies[0].id);
+      } else if (companies.length > 1) {
+        // Plusieurs entreprises pour un non-superuser : sélectionner la première
+        selectCompany(companies[0].id);
       }
     }
   } catch (error) {
@@ -2078,8 +2097,17 @@ async function loadCompanySelector() {
   }
 }
 
-// Fonction pour réinitialiser la sélection d'entreprise (pour les admins)
+// Fonction pour réinitialiser la sélection d'entreprise (pour les superusers uniquement)
 function resetCompanySelection() {
+  // Vérifier les permissions
+  const currentUser = localStorage.getItem('user');
+  const user = currentUser ? JSON.parse(currentUser) : null;
+  
+  if (!user || user.role !== 'superuser') {
+    showAlert('Accès refusé - Seuls les superusers peuvent voir toutes les entreprises', 'danger');
+    return;
+  }
+  
   selectedCompanyId = null;
   localStorage.removeItem('selectedCompanyId');
   selectCompany(null);
@@ -2103,10 +2131,10 @@ function selectCompany(companyId) {
   const currentCompanyInfo = document.getElementById('current-company-info');
   const resetCompanyBtn = document.getElementById('reset-company-btn');
   
-  // Vérifier si l'utilisateur est admin
+  // Vérifier si l'utilisateur est superuser
   const currentUser = localStorage.getItem('user');
   const user = currentUser ? JSON.parse(currentUser) : null;
-  const isAdmin = user && user.role === 'admin';
+  const isSuperuser = user && user.role === 'superuser';
   
   if (companyId) {
     // Trouver le nom de l'entreprise
@@ -2117,8 +2145,8 @@ function selectCompany(companyId) {
     if (dashboardCompanyName) dashboardCompanyName.textContent = companyName;
     if (currentCompanyInfo) currentCompanyInfo.classList.remove('d-none');
     
-    // Afficher le bouton de réinitialisation pour les admins
-    if (resetCompanyBtn && isAdmin) {
+    // Afficher le bouton de réinitialisation pour les superusers
+    if (resetCompanyBtn && isSuperuser) {
       resetCompanyBtn.classList.remove('d-none');
     }
   } else {

@@ -51,13 +51,29 @@ exports.createBar = async (req, res) => {
   }
 };
 
-// Obtenir tous les bars
+// Obtenir tous les bars (avec filtrage selon les permissions)
 exports.getAllBars = async (req, res) => {
   try {
-    const { companyId } = req.query || {};
+    const { companyId } = req.query;
+    const currentUser = req.user;
     
-    const whereClause = {};
-    if (companyId) {
+    let whereClause = {};
+    
+    // Filtrage selon le rôle de l'utilisateur connecté
+    if (currentUser && currentUser.role !== 'superuser') {
+      // Tous les rôles sauf superuser ne voient que les bars de leur entreprise
+      if (currentUser.companyId) {
+        whereClause.companyId = currentUser.companyId;
+      } else {
+        // Si l'utilisateur n'a pas d'entreprise assignée, ne renvoyer aucun bar
+        return res.status(200).json({
+          success: true,
+          count: 0,
+          data: []
+        });
+      }
+    } else if (companyId) {
+      // Pour les superusers, respecter le filtre companyId s'il est fourni
       whereClause.companyId = companyId;
     }
     
@@ -88,17 +104,34 @@ exports.getAllBars = async (req, res) => {
   }
 };
 
-// Obtenir un bar par son ID
+// Obtenir un bar par son ID (avec vérification des permissions)
 exports.getBarById = async (req, res) => {
   try {
     const { id } = req.params;
+    const currentUser = req.user;
     
-    const bar = await Bar.findByPk(id);
+    const bar = await Bar.findByPk(id, {
+      include: [
+        {
+          model: Company,
+          attributes: ['id', 'name']
+        }
+      ]
+    });
     
     if (!bar) {
       return res.status(404).json({
         success: false,
         message: "Bar non trouvé"
+      });
+    }
+    
+    // Vérifier les permissions : seuls les superusers peuvent voir tout bar
+    // Les autres ne peuvent voir que les bars de leur entreprise
+    if (currentUser.role !== 'superuser' && currentUser.companyId !== bar.companyId) {
+      return res.status(403).json({
+        success: false,
+        message: "Accès refusé - Vous ne pouvez voir que les bars de votre entreprise"
       });
     }
     
