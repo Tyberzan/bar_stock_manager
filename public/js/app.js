@@ -1140,39 +1140,17 @@ function populateBarSelector(selector, bars, defaultText) {
 // Charger le tableau des stocks
 async function loadStocksTable(barId = null) {
   try {
-    console.log('🔍 [CLIENT] loadStocksTable appelé avec barId:', barId);
-    
     let url = '/stocks';
     if (barId) {
       url += `?barId=${barId}`;
     }
     
-    console.log('📤 [CLIENT] Appel API:', url);
-    
     const response = await fetchWithAuth(url);
     
-    console.log('📥 [CLIENT] Réponse API reçue:', {
-      success: response?.success,
-      count: response?.count,
-      hasData: !!response?.data,
-      dataLength: response?.data?.length || 0
-    });
-    
     if (response && response.success) {
-      console.log('✅ [CLIENT] API success - Appel displayStocks()');
-      console.log('📊 [CLIENT] Premier stock reçu:', response.data?.[0] ? {
-        id: response.data[0].id,
-        barId: response.data[0].barId,
-        hasProduct: !!response.data[0].Product,
-        productName: response.data[0].Product?.name,
-        hasBar: !!response.data[0].Bar,
-        barName: response.data[0].Bar?.name,
-        quantities: `${response.data[0].currentQuantity}/${response.data[0].minThreshold}/${response.data[0].maxThreshold}`
-      } : 'Aucune donnée');
-      
       displayStocks(response.data);
     } else {
-      console.error('❌ [CLIENT] API failed:', response);
+      console.error('❌ [CLIENT] Erreur chargement stocks:', response);
       displayStocks([]);
     }
   } catch (error) {
@@ -1183,8 +1161,6 @@ async function loadStocksTable(barId = null) {
 
 // Afficher les stocks dans le tableau
 function displayStocks(stocks) {
-  console.log('🎨 [CLIENT] displayStocks appelé avec', stocks.length, 'stocks');
-  
   const tbody = document.getElementById('stocks-table-body');
   if (!tbody) {
     console.error('❌ [CLIENT] Element stocks-table-body introuvable !');
@@ -1194,22 +1170,9 @@ function displayStocks(stocks) {
   tbody.innerHTML = '';
   
   if (stocks.length === 0) {
-    console.log('⚠️ [CLIENT] Aucun stock à afficher');
     tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Aucun stock trouvé</td></tr>';
     return;
   }
-  
-  console.log('📊 [CLIENT] Affichage de', stocks.length, 'stocks:');
-  stocks.slice(0, 3).forEach((stock, index) => {
-    console.log(`   Stock ${index + 1}:`, {
-      id: stock.id,
-      hasProduct: !!stock.Product,
-      productName: stock.Product?.name || 'MANQUANT',
-      hasBar: !!stock.Bar,
-      barName: stock.Bar?.name || 'MANQUANT',
-      quantities: `${stock.currentQuantity}/${stock.minThreshold}/${stock.maxThreshold}`
-    });
-  });
   
   stocks.forEach(stock => {
     const row = document.createElement('tr');
