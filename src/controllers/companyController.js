@@ -35,8 +35,8 @@ exports.getAllCompanies = async (req, res) => {
     let whereClause = {};
     
     // Filtrage selon le rôle de l'utilisateur connecté
-    if (currentUser && currentUser.role !== 'superuser') {
-      // Tous les rôles sauf superuser ne voient que leur entreprise
+    if (currentUser && currentUser.role !== 'superuser' && currentUser.role !== 'admin') {
+      // Managers et users ne voient que leur entreprise
       if (currentUser.companyId) {
         whereClause.id = currentUser.companyId;
       } else {
@@ -47,8 +47,11 @@ exports.getAllCompanies = async (req, res) => {
           data: []
         });
       }
+    } else if (currentUser && currentUser.role === 'admin' && currentUser.companyId) {
+      // Admin avec companyId spécifique ne voit que son entreprise
+      whereClause.id = currentUser.companyId;
     }
-    // superuser voit toutes les entreprises (pas de filtre)
+    // superuser et admin sans companyId voient toutes les entreprises (pas de filtre)
     
     const companies = await Company.findAll({
       where: whereClause,
@@ -84,9 +87,12 @@ exports.getCompanyById = async (req, res) => {
     const { id } = req.params;
     const currentUser = req.user;
     
-    // Vérifier les permissions : seuls les superusers peuvent voir toute entreprise
+    // Vérifier les permissions
+    // superuser et admin sans companyId peuvent voir toute entreprise
     // Les autres ne peuvent voir que leur propre entreprise
-    if (currentUser.role !== 'superuser' && currentUser.companyId != id) {
+    if (currentUser.role !== 'superuser' && 
+        !(currentUser.role === 'admin' && currentUser.companyId === null) &&
+        currentUser.companyId != id) {
       return res.status(403).json({
         success: false,
         message: "Accès refusé - Vous ne pouvez voir que les informations de votre entreprise"

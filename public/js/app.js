@@ -92,6 +92,16 @@ function updateUIForUserRole() {
     }
   }
   
+  // Gérer l'affichage du bouton "Ajouter un bar" (visible seulement pour admin et superuser)
+  const addBarBtn = document.getElementById('add-bar-btn');
+  if (addBarBtn) {
+    if (userRole === 'user' || userRole === 'manager') {
+      addBarBtn.style.display = 'none';
+    } else {
+      addBarBtn.style.display = 'block';
+    }
+  }
+  
   // Affichage conditionnel selon les permissions
   console.log(`Interface mise à jour pour le rôle: ${userRole} (${roleLabels[userRole] || userRole})`);
 }
@@ -189,6 +199,8 @@ function handleRoute() {
         if (typeof loadBars === 'function') {
           loadBars();
         }
+        // Mettre à jour l'interface selon les permissions utilisateur
+        updateUIForUserRole();
         break;
       case 'stocks':
         if (typeof loadStocks === 'function') {
@@ -1010,9 +1022,39 @@ function displayBars(bars) {
     return;
   }
   
+  // Récupérer le rôle de l'utilisateur connecté
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = user.role;
+  
   bars.forEach(bar => {
     const companyName = bar.Company ? bar.Company.name : 'Aucune entreprise';
     const row = document.createElement('tr');
+    
+    // Définir les boutons d'action selon le rôle
+    let actionButtons = '';
+    
+    if (userRole === 'superuser' || userRole === 'admin') {
+      // Administrateurs : boutons de modification, suppression et stocks
+      actionButtons = `
+        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="openBarModal(${bar.id})" title="Modifier">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-danger me-1" onclick="deleteBar(${bar.id})" title="Supprimer">
+          <i class="bi bi-trash"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-success" onclick="viewBarStocks(${bar.id})" title="Voir les stocks">
+          <i class="bi bi-box-seam"></i>
+        </button>
+      `;
+    } else {
+      // Utilisateurs et managers : seulement le bouton stocks
+      actionButtons = `
+        <button type="button" class="btn btn-sm btn-outline-success" onclick="viewBarStocks(${bar.id})" title="Voir les stocks">
+          <i class="bi bi-box-seam"></i> Stocks
+        </button>
+      `;
+    }
+    
     row.innerHTML = `
       <td>${bar.name}</td>
       <td>
@@ -1025,12 +1067,7 @@ function displayBars(bars) {
         </span>
       </td>
       <td>
-        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="openBarModal(${bar.id})" title="Modifier">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteBar(${bar.id})" title="Supprimer">
-          <i class="bi bi-trash"></i>
-        </button>
+        ${actionButtons}
       </td>
     `;
     tbody.appendChild(row);
@@ -1049,6 +1086,33 @@ function deleteBar(barId) {
   if (confirm('Êtes-vous sûr de vouloir supprimer ce bar ?')) {
     showAlert('Fonction de suppression en cours de développement', 'info');
   }
+}
+
+// Fonction pour voir les stocks d'un bar spécifique
+function viewBarStocks(barId) {
+  console.log('Navigation vers les stocks du bar ID:', barId);
+  
+  // Naviguer vers la page stocks
+  navigateTo('stocks');
+  
+  // Attendre que la page soit chargée puis sélectionner le bar
+  setTimeout(() => {
+    const stockBarSelect = document.getElementById('stock-bar-select');
+    if (stockBarSelect) {
+      // Présélectionner le bar
+      stockBarSelect.value = barId;
+      
+      // Déclencher l'événement change pour charger les stocks
+      const changeEvent = new Event('change', { bubbles: true });
+      stockBarSelect.dispatchEvent(changeEvent);
+      
+      // Afficher un message de confirmation
+      showAlert(`Affichage des stocks du bar sélectionné`, 'success');
+    } else {
+      console.error('Sélecteur de bar non trouvé');
+      showAlert('Erreur lors du chargement de la page stocks', 'danger');
+    }
+  }, 100); // Petit délai pour s'assurer que la page est chargée
 }
 
 // ====================================

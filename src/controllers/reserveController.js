@@ -50,51 +50,44 @@ const getReserveById = async (req, res) => {
   }
 };
 
-// Créer une nouvelle réserve
+// Créer une nouvelle réserve physique
 const createReserve = async (req, res) => {
   try {
-    const { formatId, quantity, minQuantity, maxQuantity, location, notes } = req.body;
+    const { name, type, temperature, capacity, location, description, companyId } = req.body;
 
-    // Vérifier si le format existe
-    const format = await Format.findByPk(formatId);
-    if (!format) {
-      return res.status(404).json({
+    // Validation des champs requis
+    if (!name || !type) {
+      return res.status(400).json({
         success: false,
-        message: 'Format non trouvé'
+        message: 'Le nom et le type de réserve sont requis'
       });
     }
 
-    // Vérifier si une réserve existe déjà pour ce format
-    const existingReserve = await Reserve.findOne({ where: { formatId } });
+    // Vérifier si une réserve avec ce nom existe déjà
+    const existingReserve = await Reserve.findOne({ 
+      where: { name, companyId: companyId || null } 
+    });
     if (existingReserve) {
       return res.status(400).json({
         success: false,
-        message: 'Une réserve existe déjà pour ce format'
+        message: 'Une réserve avec ce nom existe déjà'
       });
     }
 
     const reserve = await Reserve.create({
-      formatId,
-      quantity: quantity || 0,
-      minQuantity: minQuantity || 10,
-      maxQuantity: maxQuantity || 100,
+      name,
+      type,
+      temperature,
+      capacity,
       location,
-      notes,
-      lastRestockDate: quantity > 0 ? new Date() : null
-    });
-
-    const createdReserve = await Reserve.findByPk(reserve.id, {
-      include: [
-        {
-          model: Format,
-          include: [{ model: Product }]
-        }
-      ]
+      description,
+      companyId: companyId || null,
+      isActive: true
     });
 
     res.status(201).json({
       success: true,
-      data: createdReserve,
+      data: reserve,
       message: 'Réserve créée avec succès'
     });
   } catch (error) {
@@ -107,11 +100,11 @@ const createReserve = async (req, res) => {
   }
 };
 
-// Mettre à jour une réserve
+// Mettre à jour une réserve physique
 const updateReserve = async (req, res) => {
   try {
     const { id } = req.params;
-    const { quantity, minQuantity, maxQuantity, location, notes, isActive } = req.body;
+    const { name, type, temperature, capacity, location, description, isActive } = req.body;
 
     const reserve = await Reserve.findByPk(id);
     if (!reserve) {
@@ -121,26 +114,19 @@ const updateReserve = async (req, res) => {
       });
     }
 
-    const oldQuantity = reserve.quantity;
-    
+    // Mettre à jour seulement les champs qui existent dans le modèle Reserve
     await reserve.update({
-      quantity: quantity !== undefined ? quantity : reserve.quantity,
-      minQuantity: minQuantity !== undefined ? minQuantity : reserve.minQuantity,
-      maxQuantity: maxQuantity !== undefined ? maxQuantity : reserve.maxQuantity,
+      name: name !== undefined ? name : reserve.name,
+      type: type !== undefined ? type : reserve.type,
+      temperature: temperature !== undefined ? temperature : reserve.temperature,
+      capacity: capacity !== undefined ? capacity : reserve.capacity,
       location: location !== undefined ? location : reserve.location,
-      notes: notes !== undefined ? notes : reserve.notes,
-      isActive: isActive !== undefined ? isActive : reserve.isActive,
-      lastRestockDate: (quantity !== undefined && quantity > oldQuantity) ? new Date() : reserve.lastRestockDate
+      description: description !== undefined ? description : reserve.description,
+      isActive: isActive !== undefined ? isActive : reserve.isActive
     });
 
-    const updatedReserve = await Reserve.findByPk(id, {
-      include: [
-        {
-          model: Format,
-          include: [{ model: Product }]
-        }
-      ]
-    });
+    // Récupérer la réserve mise à jour sans inclusions incorrectes
+    const updatedReserve = await Reserve.findByPk(id);
 
     res.json({
       success: true,
@@ -317,121 +303,75 @@ const transferToBar = async (req, res) => {
   }
 };
 
-// Initialiser les réserves pour tous les formats
+// Initialiser les réserves par défaut
 const initializeReserves = async (req, res) => {
   try {
-    // Récupérer tous les formats actifs qui n'ont pas encore de réserve
-    const formats = await Format.findAll({
-      include: [{ model: Product }],
-      where: { isActive: true }
-    });
-
-    if (formats.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Aucun format trouvé pour initialiser les réserves'
-      });
-    }
-
-    // Vérifier quels formats n'ont pas encore de réserve
-    const existingReserves = await Reserve.findAll({
-      attributes: ['formatId']
-    });
-    const existingFormatIds = existingReserves.map(r => r.formatId);
+    // Vérifier s'il y a déjà des réserves
+    const existingReserves = await Reserve.count();
     
-    const formatsToInitialize = formats.filter(format => !existingFormatIds.includes(format.id));
-
-    if (formatsToInitialize.length === 0) {
+    if (existingReserves > 0) {
       return res.status(400).json({
         success: false,
-        message: 'Toutes les réserves sont déjà initialisées'
+        message: 'Des réserves existent déjà dans le système'
       });
     }
 
-    // Créer les réserves avec des valeurs par défaut intelligentes
-    const reservesToCreate = formatsToInitialize.map(format => {
-      const product = format.Product;
-      const category = product?.category || 'other';
-      
-      // Définir des quantités par défaut selon la catégorie
-      let defaultQuantity = 0;
-      let minQuantity = 10;
-      let maxQuantity = 100;
-      let location = 'À définir';
-      
-      switch (category.toLowerCase()) {
-        case 'beer':
-        case 'bière':
-          minQuantity = 20;
-          maxQuantity = 150;
-          location = 'Zone bières';
-          break;
-        case 'soft':
-        case 'soda':
-          minQuantity = 15;
-          maxQuantity = 200;
-          location = 'Zone sodas';
-          break;
-        case 'spirit':
-        case 'spiritueux':
-          minQuantity = 5;
-          maxQuantity = 50;
-          location = 'Armoire sécurisée';
-          break;
-        case 'wine':
-        case 'vin':
-          minQuantity = 8;
-          maxQuantity = 60;
-          location = 'Cave à vin';
-          break;
-        default:
-          minQuantity = 10;
-          maxQuantity = 100;
-          location = 'Zone générale';
-      }
-
-      return {
-        formatId: format.id,
-        quantity: defaultQuantity,
-        minQuantity,
-        maxQuantity,
-        location,
-        notes: `Réserve initialisée automatiquement pour ${product?.name || 'produit'} ${format.size}`,
+    // Créer des réserves par défaut selon les types de stockage
+    const defaultReserves = [
+      {
+        name: 'Réserve Frigorifique Principale',
+        type: 'frigorifique',
+        temperature: '+4°C',
+        capacity: 500,
+        location: 'Cave frigorifique',
+        description: 'Réserve principale pour les boissons réfrigérées',
         isActive: true
-      };
-    });
+      },
+      {
+        name: 'Réserve Sèche',
+        type: 'sec',
+        temperature: 'Ambiante',
+        capacity: 1000,
+        location: 'Entrepôt principal',
+        description: 'Stockage à température ambiante pour spiritueux et conserves',
+        isActive: true
+      },
+      {
+        name: 'Cave à Vins',
+        type: 'cave',
+        temperature: '+12°C',
+        capacity: 200,
+        location: 'Cave climatisée',
+        description: 'Stockage optimal pour les vins',
+        isActive: true
+      },
+      {
+        name: 'Congélateur',
+        type: 'congelateur',
+        temperature: '-18°C',
+        capacity: 100,
+        location: 'Zone congélation',
+        description: 'Stockage pour produits surgelés',
+        isActive: true
+      }
+    ];
 
-    // Créer toutes les réserves en une seule transaction
+    // Créer les réserves en une seule transaction
     const { sequelize } = require('../config/database');
     const transaction = await sequelize.transaction();
 
     try {
-      const createdReserves = await Reserve.bulkCreate(reservesToCreate, { transaction });
+      const createdReserves = await Reserve.bulkCreate(defaultReserves, { transaction });
       await transaction.commit();
-
-      // Récupérer les réserves créées avec leurs relations
-      const reservesWithDetails = await Reserve.findAll({
-        where: {
-          id: createdReserves.map(r => r.id)
-        },
-        include: [
-          {
-            model: Format,
-            include: [{ model: Product }]
-          }
-        ]
-      });
 
       res.json({
         success: true,
-        data: reservesWithDetails,
+        data: createdReserves,
         message: `${createdReserves.length} réserve(s) initialisée(s) avec succès`,
         summary: {
           total: createdReserves.length,
-          byCategory: reservesToCreate.reduce((acc, reserve) => {
-            const format = formatsToInitialize.find(f => f.id === reserve.formatId);
-            const category = format?.Product?.category || 'other';
-            acc[category] = (acc[category] || 0) + 1;
+          types: createdReserves.reduce((acc, reserve) => {
+            acc[reserve.type] = (acc[reserve.type] || 0) + 1;
             return acc;
           }, {})
         }

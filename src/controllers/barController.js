@@ -62,8 +62,8 @@ exports.getAllBars = async (req, res) => {
     let whereClause = {};
     
     // Filtrage selon le rôle de l'utilisateur connecté
-    if (currentUser && currentUser.role !== 'superuser') {
-      // Tous les rôles sauf superuser ne voient que les bars de leur entreprise
+    if (currentUser && currentUser.role !== 'superuser' && currentUser.role !== 'admin') {
+      // Managers et users ne voient que les bars de leur entreprise
       if (currentUser.companyId) {
         whereClause.companyId = currentUser.companyId;
       } else {
@@ -74,8 +74,11 @@ exports.getAllBars = async (req, res) => {
           data: []
         });
       }
+    } else if (currentUser && currentUser.role === 'admin' && currentUser.companyId) {
+      // Admin avec companyId spécifique ne voit que les bars de son entreprise
+      whereClause.companyId = currentUser.companyId;
     } else if (companyId) {
-      // Pour les superusers, respecter le filtre companyId s'il est fourni
+      // Pour les superusers et admin sans companyId, respecter le filtre companyId s'il est fourni
       whereClause.companyId = companyId;
     }
     
