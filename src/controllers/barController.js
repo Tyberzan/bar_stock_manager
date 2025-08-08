@@ -54,10 +54,8 @@ exports.createBar = async (req, res) => {
 // Obtenir tous les bars (avec filtrage selon les permissions)
 exports.getAllBars = async (req, res) => {
   try {
-    const { companyId } = req.query;
+    const { companyId } = req.query || {};
     const currentUser = req.user;
-    
-
     
     let whereClause = {};
     

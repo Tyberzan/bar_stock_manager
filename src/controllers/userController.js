@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 // Récupérer tous les utilisateurs (avec filtrage selon les permissions)
 const getAllUsers = async (req, res) => {
   try {
-    const currentUser = req.user;
+    const currentUser = req.user || {};
     let whereClause = {};
     
     // Filtrage selon le rôle de l'utilisateur connecté

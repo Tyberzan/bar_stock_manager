@@ -96,15 +96,15 @@ exports.createOrUpdateStock = async (req, res) => {
 exports.getAllStocks = async (req, res) => {
   try {
     const query = {};
-    const { companyId } = req.query;
+    const { companyId } = req.query || {};
     
     // Filtre par barId si spécifié
-    if (req.query.barId) {
+    if (req.query && req.query.barId) {
       query.barId = req.query.barId;
     }
     
     // Filtre par formatId si spécifié
-    if (req.query.formatId) {
+    if (req.query && req.query.formatId) {
       query.formatId = req.query.formatId;
     }
     
@@ -131,6 +131,9 @@ exports.getAllStocks = async (req, res) => {
           model: Format,
           include: [Product]
         },
+        {
+          model: Product
+        },
         barInclude
       ],
       order: [['id', 'ASC']]
@@ -143,7 +146,8 @@ exports.getAllStocks = async (req, res) => {
     });
     
   } catch (error) {
-    console.error(error);
+    console.error('❌ [STOCK API] ERREUR dans getAllStocks:', error.message);
+    console.error('❌ [STOCK API] Stack trace:', error.stack);
     return res.status(500).json({
       success: false,
       message: "Erreur lors de la récupération des stocks",
@@ -342,12 +346,12 @@ exports.getStocksToRestock = async (req, res) => {
       });
     }
     
-    // Trouver tous les stocks où currentQuantity < minQuantity
+    // Trouver tous les stocks où currentQuantity < minThreshold
     const stocksToRestock = await Stock.findAll({
       where: {
         barId,
         currentQuantity: {
-          [Op.lt]: sequelize.col('minQuantity')
+          [Op.lt]: sequelize.col('minThreshold')
         }
       },
       include: [
@@ -358,7 +362,7 @@ exports.getStocksToRestock = async (req, res) => {
         Bar
       ],
       order: [
-        [sequelize.literal('(minQuantity - currentQuantity)'), 'DESC']  // Trier par quantité manquante
+        [sequelize.literal('(minThreshold - currentQuantity)'), 'DESC']  // Trier par quantité manquante
       ]
     });
     
@@ -524,7 +528,7 @@ exports.generateRestockReport = async (req, res) => {
     
     // Récupérer les stocks à réapprovisionner (quantité actuelle < quantité minimale)
     const stocksToRestock = allStocks.filter(stock => 
-      stock.currentQuantity < stock.minQuantity
+      stock.currentQuantity < stock.minThreshold
     );
     
     // Organiser les produits par catégorie

@@ -340,7 +340,7 @@ async function loadDashboardData() {
     const activeProductsCount = products.filter(p => p.isActive !== false).length;
     const lowStockCount = stocks.filter(stock => {
       const currentQty = stock.currentQuantity || stock.quantity || 0;
-      const minQty = stock.minQuantity || 0;
+      const minQty = stock.minThreshold || 0;
       return currentQty <= minQty && currentQty > 0;
     }).length;
     
@@ -408,7 +408,7 @@ function displayAllBarsStatus(bars, stocks, products) {
     const totalProducts = barStocks.length;
     const lowStockProducts = barStocks.filter(stock => {
       const currentQty = stock.currentQuantity || stock.quantity || 0;
-      const minQty = stock.minQuantity || 0;
+      const minQty = stock.minThreshold || 0;
       return currentQty <= minQty && currentQty > 0;
     }).length;
     const outOfStockProducts = barStocks.filter(stock => {
@@ -436,7 +436,7 @@ function displayAllBarsStatus(bars, stocks, products) {
     const restockItems = barStocks
       .filter(stock => {
         const currentQty = stock.currentQuantity || stock.quantity || 0;
-        const idealQty = stock.idealQuantity || 0;
+        const idealQty = stock.maxThreshold || 0;
         return currentQty < idealQty;
       })
       .sort((a, b) => {
@@ -461,7 +461,7 @@ function displayAllBarsStatus(bars, stocks, products) {
         const productName = product ? product.name : 'Produit inconnu';
         const format = stock.Format ? `${stock.Format.size}` : 'Format inconnu';
         const currentQty = stock.currentQuantity || stock.quantity || 0;
-        const idealQty = stock.idealQuantity || 0;
+        const idealQty = stock.maxThreshold || 0;
         const toRestock = Math.max(0, idealQty - currentQty);
         
         return `
@@ -1208,14 +1208,15 @@ async function loadStocksTable(barId = null) {
     }
     
     const response = await fetchWithAuth(url);
+    
     if (response && response.success) {
       displayStocks(response.data);
     } else {
-      console.error('Erreur lors du chargement des stocks:', response);
+      console.error('❌ [CLIENT] Erreur chargement stocks:', response);
       displayStocks([]);
     }
   } catch (error) {
-    console.error('Erreur lors du chargement des stocks:', error);
+    console.error('❌ [CLIENT] Erreur loadStocksTable:', error);
     displayStocks([]);
   }
 }
@@ -1223,7 +1224,10 @@ async function loadStocksTable(barId = null) {
 // Afficher les stocks dans le tableau
 function displayStocks(stocks) {
   const tbody = document.getElementById('stocks-table-body');
-  if (!tbody) return;
+  if (!tbody) {
+    console.error('❌ [CLIENT] Element stocks-table-body introuvable !');
+    return;
+  }
   
   tbody.innerHTML = '';
   
@@ -1239,10 +1243,10 @@ function displayStocks(stocks) {
     let statusClass = 'success';
     let statusText = 'Bon';
     
-    if (stock.currentQuantity <= stock.minQuantity) {
+    if (stock.currentQuantity <= stock.minThreshold) {
       statusClass = 'danger';
       statusText = 'Stock faible';
-    } else if (stock.currentQuantity <= (stock.minQuantity + (stock.idealQuantity - stock.minQuantity) * 0.3)) {
+    } else if (stock.currentQuantity <= (stock.minThreshold + (stock.maxThreshold - stock.minThreshold) * 0.3)) {
       statusClass = 'warning';
       statusText = 'Stock moyen';
     }
@@ -1252,8 +1256,8 @@ function displayStocks(stocks) {
       <td>${stock.Format && stock.Format.Product ? stock.Format.Product.name : 'Produit inconnu'}</td>
       <td>${stock.Format ? `${stock.Format.size} (${stock.Format.volume}${stock.Format.unit})` : 'Format inconnu'}</td>
       <td>${stock.currentQuantity}</td>
-      <td>${stock.minQuantity}</td>
-      <td>${stock.idealQuantity}</td>
+      <td>${stock.minThreshold}</td>
+      <td>${stock.maxThreshold}</td>
       <td>
         <span class="badge bg-${statusClass}">${statusText}</span>
       </td>
@@ -1356,7 +1360,7 @@ async function loadRestockItems(barId) {
       if (!stock.Format || !stock.Format.Product) return;
       
       const currentQuantity = stock.currentQuantity || 0;
-      const idealQuantity = stock.idealQuantity || 30;
+      const idealQuantity = stock.maxThreshold || 30;
       
       // Calculer la quantité à recharger
       let toRestock = 0;
@@ -1398,7 +1402,7 @@ async function loadRestockItems(barId) {
           <td>${item.product.name} ${item.product.brand ? `(${item.product.brand})` : ''}</td>
           <td>${item.format.size || item.format.name} ${item.format.volume ? `${item.format.volume} ${item.format.unit}` : ''}</td>
           <td>${item.currentQuantity}</td>
-          <td>${item.idealQuantity}</td>
+          <td>${item.maxThreshold}</td>
           <td><strong class="text-warning">${item.toRestock}</strong></td>
         `;
         restockTbody.appendChild(row);
@@ -1995,7 +1999,7 @@ async function loadStocksForTransfer(barId) {
         const option = document.createElement('option');
         option.value = stock.id;
         const currentQty = stock.currentQuantity || stock.quantity || 0;
-        option.textContent = `Stock actuel: ${currentQty} (Min: ${stock.minQuantity}, Max: ${stock.idealQuantity})`;
+        option.textContent = `Stock actuel: ${currentQty} (Min: ${stock.minThreshold}, Max: ${stock.maxThreshold})`;
         stockSelect.appendChild(option);
       });
     }

@@ -2350,3 +2350,144 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Event listeners pour le bouton "Ajouter un produit au stock"
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔧 Initialisation des event listeners pour ajouter produit au stock');
+  
+  // Event listener pour le bouton d'ouverture de la modal
+  const addProductBtn = document.getElementById('add-product-to-bar-btn');
+  if (addProductBtn) {
+    addProductBtn.addEventListener('click', function() {
+      console.log('🔘 Clic sur bouton ajouter produit au stock');
+      
+      // Charger la liste des bars dans le dropdown
+      loadBarsForProductAddition();
+      
+      // Ouvrir la modal
+      const modal = new bootstrap.Modal(document.getElementById('add-product-to-bar-modal'));
+      modal.show();
+    });
+    console.log('✅ Event listener ajouté sur bouton add-product-to-bar-btn');
+  } else {
+    console.error('❌ Bouton add-product-to-bar-btn introuvable !');
+  }
+  
+  // Event listener pour la soumission du formulaire
+  const addProductForm = document.getElementById('add-product-to-bar-form');
+  if (addProductForm) {
+    addProductForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      console.log('📝 Soumission formulaire ajouter produit au stock');
+      
+      try {
+        // Récupérer les données du formulaire
+        const formData = new FormData(addProductForm);
+        const barId = document.getElementById('new-product-bar').value;
+        const productName = document.getElementById('new-product-name').value.trim();
+        const productBrand = document.getElementById('new-product-brand').value.trim();
+        const productCategory = document.getElementById('new-product-category').value;
+        const initialQuantity = parseInt(document.getElementById('new-product-quantity').value) || 0;
+        const minQuantity = parseInt(document.getElementById('new-product-min-quantity').value) || 10;
+        const idealQuantity = parseInt(document.getElementById('new-product-ideal-quantity').value) || 30;
+        
+        // Validation
+        if (!barId) {
+          showAlert('Veuillez sélectionner un bar', 'warning');
+          return;
+        }
+        
+        if (!productName) {
+          showAlert('Veuillez saisir le nom du produit', 'warning');
+          return;
+        }
+        
+        console.log('📊 Données du formulaire:', {
+          barId,
+          productName,
+          productBrand,
+          productCategory,
+          initialQuantity,
+          minQuantity,
+          idealQuantity
+        });
+        
+        // Préparer les données du produit
+        const productData = {
+          name: productName,
+          brand: productBrand,
+          category: productCategory,
+          currentQuantity: initialQuantity,
+          minThreshold: minQuantity,  // Utiliser minThreshold au lieu de minQuantity
+          maxThreshold: idealQuantity  // Utiliser maxThreshold au lieu de idealQuantity
+        };
+        
+        // Appeler la fonction addProductToBar
+        await addProductToBar(barId, productData);
+        
+        // Fermer la modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('add-product-to-bar-modal'));
+        if (modal) {
+          modal.hide();
+        }
+        
+        // Réinitialiser le formulaire
+        addProductForm.reset();
+        
+        // Recharger les stocks si on est sur la page stocks
+        if (window.location.hash === '#stocks') {
+          const selectedBarId = document.getElementById('stock-bar-filter')?.value;
+          if (selectedBarId) {
+            loadStocksTable(selectedBarId);
+          }
+        }
+        
+        // Recharger le dashboard si on est sur la page principale
+        if (window.location.hash === '#dashboard' || window.location.hash === '') {
+          loadDashboard();
+        }
+        
+        console.log('✅ Produit ajouté avec succès !');
+        
+      } catch (error) {
+        console.error('❌ Erreur lors de l\'ajout du produit:', error);
+        showAlert('Erreur lors de l\'ajout du produit: ' + error.message, 'danger');
+      }
+    });
+    console.log('✅ Event listener ajouté sur formulaire add-product-to-bar-form');
+  } else {
+    console.error('❌ Formulaire add-product-to-bar-form introuvable !');
+  }
+});
+
+// Fonction pour charger la liste des bars dans le dropdown de la modal
+async function loadBarsForProductAddition() {
+  try {
+    console.log('📋 Chargement des bars pour ajout de produit');
+    
+    const response = await fetchWithAuth('/bars');
+    if (response && response.success) {
+      const barsSelect = document.getElementById('new-product-bar');
+      if (barsSelect) {
+        // Vider les options existantes (sauf la première)
+        barsSelect.innerHTML = '<option value="">Sélectionnez un bar</option>';
+        
+        // Ajouter les bars
+        response.data.forEach(bar => {
+          const option = document.createElement('option');
+          option.value = bar.id;
+          option.textContent = bar.name;
+          barsSelect.appendChild(option);
+        });
+        
+        console.log(`✅ ${response.data.length} bars chargés dans le dropdown`);
+      }
+    } else {
+      console.error('❌ Erreur lors du chargement des bars:', response);
+      showAlert('Erreur lors du chargement des bars', 'danger');
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement des bars:', error);
+    showAlert('Erreur lors du chargement des bars', 'danger');
+  }
+}
