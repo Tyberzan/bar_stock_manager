@@ -263,11 +263,14 @@ function displayProducts(products) {
         </span>
       </td>
       <td>
-        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="openProductModal(${product.id})">
+        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="openProductModal(${product.id})" title="Modifier le produit">
           <i class="bi bi-pencil"></i>
         </button>
-        <button type="button" class="btn btn-sm btn-outline-success me-1" onclick="openFormatModal(null, ${product.id})">
-          Ajouter format
+        <button type="button" class="btn btn-sm btn-outline-success me-1" onclick="openFormatModal(null, ${product.id})" title="Ajouter un format">
+          <i class="bi bi-plus-square"></i> Format
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-warning" onclick="openAddToStockModal(${product.id})" title="Ajouter au stock d'un bar">
+          <i class="bi bi-box-seam"></i> Stock
         </button>
       </td>
     `;
@@ -3245,4 +3248,186 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialiser la route actuelle
   handleRoute();
-}); 
+});
+
+// ====================================
+// GESTION D'AJOUT DE PRODUIT AU STOCK
+// ====================================
+
+// Variable globale pour stocker les données du produit sélectionné
+let selectedProductData = null;
+
+// Fonction pour ouvrir la modale d'ajout au stock
+async function openAddToStockModal(productId) {
+  try {
+    console.log('Ouverture de la modale pour ajouter le produit', productId, 'au stock');
+    
+    // Récupérer les détails du produit avec ses formats
+    const productResponse = await fetchWithAuth(`/products/${productId}`);
+    if (!productResponse || !productResponse.success) {
+      showAlert('Erreur lors de la récupération du produit', 'danger');
+      return;
+    }
+    
+    selectedProductData = productResponse.data;
+    
+    // Vérifier que le produit a des formats
+    if (!selectedProductData.Formats || selectedProductData.Formats.length === 0) {
+      showAlert('Ce produit n\'a pas de formats définis. Ajoutez d\'abord un format avant de l\'ajouter au stock.', 'warning');
+      return;
+    }
+    
+    // Remplir les informations du produit
+    document.getElementById('selected-product-id').value = productId;
+    document.getElementById('selected-product-info').innerHTML = `
+      <strong>${selectedProductData.name}</strong> ${selectedProductData.brand ? `(${selectedProductData.brand})` : ''}<br>
+      <small class="text-muted">Catégorie: ${getCategoryLabel(selectedProductData.category)} • ${selectedProductData.Formats.length} format(s) disponible(s)</small>
+    `;
+    
+    // Charger les bars disponibles selon l'entreprise sélectionnée
+    await loadBarsForStock();
+    
+    // Charger les formats du produit
+    loadProductFormats(selectedProductData.Formats);
+    
+    // Afficher la modale
+    const modal = new bootstrap.Modal(document.getElementById('add-product-to-stock-modal'));
+    modal.show();
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'ouverture de la modale:', error);
+    showAlert('Erreur lors de l\'ouverture de la modale', 'danger');
+  }
+}
+
+// Fonction pour charger les bars disponibles pour le stock
+async function loadBarsForStock() {
+  try {
+    const barsResponse = await fetchWithAuth('/bars');
+    if (barsResponse && barsResponse.success) {
+      const barSelect = document.getElementById('product-stock-bar-select');
+      barSelect.innerHTML = '<option value="">Choisissez un bar...</option>';
+      
+      // Filtrer les bars actifs
+      const activeBars = barsResponse.data.filter(bar => bar.isActive !== false);
+      
+      if (activeBars.length === 0) {
+        barSelect.innerHTML = '<option value="">Aucun bar disponible</option>';
+        return;
+      }
+      
+      activeBars.forEach(bar => {
+        const companyName = bar.Company ? ` (${bar.Company.name})` : '';
+        barSelect.innerHTML += `<option value="${bar.id}">${bar.name}${companyName}</option>`;
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des bars:', error);
+    showAlert('Erreur lors du chargement des bars', 'danger');
+  }
+}
+
+// Fonction pour charger les formats du produit
+function loadProductFormats(formats) {
+  const formatSelect = document.getElementById('product-stock-format-select');
+  formatSelect.innerHTML = '<option value="">Sélectionnez un format...</option>';
+  
+  formats.forEach(format => {
+    const sizeText = format.size ? ` - ${format.size}${format.unit || ''}` : '';
+    const typeText = format.type ? ` (${format.type})` : '';
+    formatSelect.innerHTML += `<option value="${format.id}">${format.name}${sizeText}${typeText}</option>`;
+  });
+}
+
+// Fonction pour obtenir le label de la catégorie
+function getCategoryLabel(category) {
+  const categoryLabels = {
+    'beer': 'Bière',
+    'wine': 'Vin',
+    'spirit': 'Spiritueux',
+    'soft': 'Soft',
+    'other': 'Autre'
+  };
+  return categoryLabels[category] || category;
+}
+
+// Gestionnaire d'événement pour confirmer l'ajout au stock
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmButton = document.getElementById('confirm-add-to-stock');
+  if (confirmButton) {
+    confirmButton.addEventListener('click', async function() {
+      await confirmAddToStock();
+    });
+  }
+});
+
+// Fonction pour confirmer l'ajout au stock
+async function confirmAddToStock() {
+  try {
+    const barId = document.getElementById('product-stock-bar-select').value;
+    const formatId = document.getElementById('product-stock-format-select').value;
+    const currentQuantity = parseInt(document.getElementById('stock-current-qty').value) || 0;
+    const minThreshold = parseInt(document.getElementById('stock-min-qty').value) || 10;
+    const maxThreshold = parseInt(document.getElementById('stock-max-qty').value) || 30;
+    
+    // Validation des champs requis
+    if (!barId) {
+      showAlert('Veuillez sélectionner un bar', 'warning');
+      return;
+    }
+    
+    if (!formatId) {
+      showAlert('Veuillez sélectionner un format', 'warning');
+      return;
+    }
+    
+    if (minThreshold > maxThreshold) {
+      showAlert('La quantité minimale ne peut pas être supérieure à la quantité maximale', 'warning');
+      return;
+    }
+    
+    // Préparer les données pour l'API
+    const stockData = {
+      barId: parseInt(barId),
+      formatId: parseInt(formatId),
+      currentQuantity: currentQuantity,
+      minQuantity: minThreshold,    // API utilise encore l'ancien nom
+      idealQuantity: maxThreshold   // API utilise encore l'ancien nom
+    };
+    
+    console.log('Envoi des données de stock:', stockData);
+    
+    // Envoyer la requête à l'API
+    const response = await fetchWithAuth('/stocks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(stockData)
+    });
+    
+    if (response && response.success) {
+      showAlert(response.message || 'Produit ajouté au stock avec succès', 'success');
+      
+      // Fermer la modale
+      const modal = bootstrap.Modal.getInstance(document.getElementById('add-product-to-stock-modal'));
+      modal.hide();
+      
+      // Réinitialiser le formulaire
+      document.getElementById('add-product-to-stock-form').reset();
+      selectedProductData = null;
+      
+      // Si on est sur la page stocks, recharger les données
+      if (window.location.hash === '#stocks' && typeof loadStocks === 'function') {
+        setTimeout(() => loadStocks(), 500);
+      }
+      
+    } else {
+      throw new Error(response?.message || 'Erreur lors de l\'ajout au stock');
+    }
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout au stock:', error);
+    showAlert(error.message || 'Erreur lors de l\'ajout au stock', 'danger');
+  }
+} 

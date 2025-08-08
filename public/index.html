@@ -274,6 +274,75 @@
         </div>
       </div>
 
+      <!-- Modal pour ajouter un produit au stock depuis la page produits -->
+      <div class="modal fade" id="add-product-to-stock-modal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Ajouter le produit au stock</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="add-product-to-stock-form">
+                <input type="hidden" id="selected-product-id">
+                
+                <!-- Informations sur le produit sélectionné -->
+                <div class="alert alert-info">
+                  <h6><i class="bi bi-info-circle me-2"></i>Produit sélectionné</h6>
+                  <p id="selected-product-info" class="mb-0"></p>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="product-stock-bar-select" class="form-label">Sélectionner un bar</label>
+                  <select class="form-select" id="product-stock-bar-select" required>
+                    <option value="">Choisissez un bar...</option>
+                  </select>
+                  <small class="form-text text-muted">Seuls les bars de votre entreprise sont affichés</small>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="product-stock-format-select" class="form-label">Format du produit</label>
+                  <select class="form-select" id="product-stock-format-select" required>
+                    <option value="">Sélectionnez d'abord un produit avec des formats...</option>
+                  </select>
+                  <small class="form-text text-muted">Choisissez le format à ajouter au stock</small>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="stock-current-qty" class="form-label">Quantité actuelle</label>
+                      <input type="number" class="form-control" id="stock-current-qty" min="0" value="0" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="stock-min-qty" class="form-label">Quantité minimale</label>
+                      <input type="number" class="form-control" id="stock-min-qty" min="0" value="10" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="stock-max-qty" class="form-label">Quantité maximale</label>
+                      <input type="number" class="form-control" id="stock-max-qty" min="0" value="30" required>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  <strong>Note:</strong> Si ce produit existe déjà dans le stock du bar sélectionné, les quantités seront mises à jour.
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="button" class="btn btn-primary" id="confirm-add-to-stock">Ajouter au stock</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Stocks Page -->
       <div id="stocks-page" class="d-none">
         <h2>Gestion des stocks</h2>

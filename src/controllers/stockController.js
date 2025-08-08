@@ -42,8 +42,8 @@ exports.createOrUpdateStock = async (req, res) => {
       // Mettre à jour le stock existant
       stock = await stock.update({
         currentQuantity: currentQuantity !== undefined ? currentQuantity : stock.currentQuantity,
-        minQuantity: minQuantity !== undefined ? minQuantity : stock.minQuantity,
-        idealQuantity: idealQuantity !== undefined ? idealQuantity : stock.idealQuantity
+        minThreshold: minQuantity !== undefined ? minQuantity : stock.minThreshold,
+        maxThreshold: idealQuantity !== undefined ? idealQuantity : stock.maxThreshold
       });
       
       message = "Stock mis à jour avec succès";
@@ -52,9 +52,10 @@ exports.createOrUpdateStock = async (req, res) => {
       stock = await Stock.create({
         barId,
         formatId,
+        productId: format.productId, // Utiliser le productId du format
         currentQuantity: currentQuantity || 0,
-        minQuantity: minQuantity || 10,
-        idealQuantity: idealQuantity || 30
+        minThreshold: minQuantity || 10,
+        maxThreshold: idealQuantity || 30
       });
       
       message = "Stock créé avec succès";
