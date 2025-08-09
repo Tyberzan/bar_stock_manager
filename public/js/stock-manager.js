@@ -1,18 +1,18 @@
 ﻿// Gestionnaire de stock pour les bars
-// RÃ©utiliser la variable API_URL dÃ©jÃ  dÃ©finie dans auth.js
+// Réutiliser la variable API_URL déjà  définie dans auth.js
 // const API_URL = '/api';
 
-// Variables globales pour Ã©viter les initialisations multiples
+// Variables globales pour éviter les initialisations multiples
 let stockManagerInitialized = false;
 let socket = null; // Variable globale pour stocker la connexion Socket.IO
 
-// Fonction pour charger les stocks d'un bar spÃ©cifique
+// Fonction pour charger les stocks d'un bar spécifique
 async function loadBarStock(barId) {
   try {
     const response = await fetchWithAuth(`/stocks?barId=${barId}`);
-    console.log('RÃ©ponse de chargement des stocks:', response);
+    console.log('Réponse de chargement des stocks:', response);
     
-    // Extraction des stocks selon le format de rÃ©ponse
+    // Extraction des stocks selon le format de réponse
     let stocks = [];
     if (response) {
       if (Array.isArray(response)) {
@@ -24,7 +24,7 @@ async function loadBarStock(barId) {
       }
     }
     
-    console.log(`Stocks chargÃ©s pour le bar #${barId}:`, stocks.length);
+    console.log(`Stocks chargés pour le bar #${barId}:`, stocks.length);
     return stocks;
   } catch (error) {
     console.error('Erreur lors du chargement des stocks:', error);
@@ -39,9 +39,9 @@ async function loadBarStock(barId) {
 
 // Fonction pour charger les formats disponibles pour le formulaire d'ajout de produit
 async function loadProductFormats() {
-  // VÃ©rifier l'authentification avant de faire l'appel API
+  // Vérifier l'authentification avant de faire l'appel API
   if (!checkAuth()) {
-    console.log('Utilisateur non authentifiÃ©, chargement des formats diffÃ©rÃ©');
+    console.log('Utilisateur non authentifié, chargement des formats différé');
     return;
   }
   
@@ -55,9 +55,9 @@ async function loadProductFormats() {
   try {
     console.log('Chargement des formats...');
     const response = await fetchWithAuth('/formats');
-    console.log('RÃ©ponse brute de l\'API formats:', response);
+    console.log('Réponse brute de l\'API formats:', response);
     
-    // Extraction des formats en fonction du format de rÃ©ponse
+    // Extraction des formats en fonction du format de réponse
     let formats = [];
     if (response) {
       if (Array.isArray(response)) {
@@ -67,15 +67,15 @@ async function loadProductFormats() {
       } else if (response.formats && Array.isArray(response.formats)) {
         formats = response.formats;
       } else {
-        console.warn('Format de rÃ©ponse inattendu pour les formats:', response);
+        console.warn('Format de réponse inattendu pour les formats:', response);
       }
     }
     
     console.log('Formats extraits:', formats);
     
     if (!formats || formats.length === 0) {
-      console.log('Aucun format trouvÃ©, tentative de crÃ©ation de formats par dÃ©faut');
-      // Tenter de crÃ©er des formats par dÃ©faut si nÃ©cessaire
+      console.log('Aucun format trouvé, tentative de création de formats par défaut');
+      // Tenter de créer des formats par défaut si nécessaire
       await createDefaultFormats();
       return;
     }
@@ -84,26 +84,26 @@ async function loadProductFormats() {
     if (formatSelect) {
       formatSelect.innerHTML = '';
       
-      // Si aucun format n'est disponible, ajouter un message et tenter d'en crÃ©er
+      // Si aucun format n'est disponible, ajouter un message et tenter d'en créer
       if (formats.length === 0) {
-        console.log('Aucun format disponible, crÃ©ation de formats par dÃ©faut');
+        console.log('Aucun format disponible, création de formats par défaut');
         await createDefaultFormats();
         
         const option = document.createElement('option');
         option.value = '';
-        option.textContent = 'Aucun format disponible - CrÃ©ez un format d\'abord';
+        option.textContent = 'Aucun format disponible - Créez un format d\'abord';
         option.disabled = true;
         option.selected = true;
         formatSelect.appendChild(option);
         
-        // DÃ©sactiver le formulaire d'ajout
+        // Désactiver le formulaire d'ajout
         const submitBtn = document.querySelector('#add-product-to-bar-form button[type="submit"]');
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.title = 'Veuillez crÃ©er un format avant d\'ajouter un produit';
+          submitBtn.title = 'Veuillez créer un format avant d\'ajouter un produit';
         }
         
-        showAlert('Aucun format disponible. Veuillez crÃ©er un format pour les produits d\'abord.', 'warning');
+        showAlert('Aucun format disponible. Veuillez créer un format pour les produits d\'abord.', 'warning');
       } else {
         // Ajouter les formats disponibles
         formats.forEach(format => {
@@ -111,7 +111,7 @@ async function loadProductFormats() {
             const option = document.createElement('option');
             option.value = format.id;
             
-            // Gestion de diffÃ©rentes structures de donnÃ©es possibles
+            // Gestion de différentes structures de données possibles
             if (format.name) {
               option.textContent = `${format.name} (${format.volume} ${format.unit}) - ${format.packaging || 'bouteille'}`;
             } else if (format.size) {
@@ -121,9 +121,9 @@ async function loadProductFormats() {
             }
             
             formatSelect.appendChild(option);
-            console.log(`Format ajoutÃ© au sÃ©lecteur: ${option.textContent}`);
+            console.log(`Format ajouté au sélecteur: ${option.textContent}`);
           } catch (err) {
-            console.error('Erreur lors de l\'ajout d\'un format au sÃ©lecteur:', err, format);
+            console.error('Erreur lors de l\'ajout d\'un format au sélecteur:', err, format);
           }
         });
         
@@ -135,22 +135,22 @@ async function loadProductFormats() {
         }
       }
     } else {
-      console.error('SÃ©lecteur de format non trouvÃ© dans le DOM');
+      console.error('Sélecteur de format non trouvé dans le DOM');
     }
   } catch (error) {
     console.error('Erreur lors du chargement des formats:', error);
     showAlert('Erreur lors du chargement des formats de produits', 'danger');
     
-    // Tenter de crÃ©er des formats par dÃ©faut
+    // Tenter de créer des formats par défaut
     await createDefaultFormats();
   }
 }
 
-// Fonction pour crÃ©er des formats par dÃ©faut
+// Fonction pour créer des formats par défaut
 async function createDefaultFormats() {
-  // VÃ©rifier l'authentification avant de faire l'appel API
+  // Vérifier l'authentification avant de faire l'appel API
   if (!checkAuth()) {
-    console.log('Utilisateur non authentifiÃ©, crÃ©ation de formats par dÃ©faut diffÃ©rÃ©e');
+    console.log('Utilisateur non authentifié, création de formats par défaut différée');
     return;
   }
   
@@ -159,12 +159,12 @@ async function createDefaultFormats() {
     { size: '50cl', unit: 'cl', volume: 50, packaging: 'bouteille' },
     { size: '75cl', unit: 'cl', volume: 75, packaging: 'bouteille' },
     { size: '1L', unit: 'L', volume: 100, packaging: 'bouteille' },
-    { size: 'Canette', unit: 'unitÃ©', volume: 33, packaging: 'canette' },
-    { size: 'Bouteille', unit: 'unitÃ©', volume: 75, packaging: 'bouteille' }
+    { size: 'Canette', unit: 'unité', volume: 33, packaging: 'canette' },
+    { size: 'Bouteille', unit: 'unité', volume: 75, packaging: 'bouteille' }
   ];
   
   try {
-    console.log('Tentative de crÃ©ation de formats par dÃ©faut...');
+    console.log('Tentative de création de formats par défaut...');
     let createdFormats = [];
     
     for (const format of defaultFormats) {
@@ -181,16 +181,16 @@ async function createDefaultFormats() {
         });
         
         if (result && result.success) {
-          console.log(`Format crÃ©Ã©: ${format.size} (${format.packaging})`);
+          console.log(`Format créé: ${format.size} (${format.packaging})`);
           createdFormats.push(result.data);
         }
       } catch (err) {
-        console.error(`Erreur lors de la crÃ©ation du format ${format.size}:`, err);
+        console.error(`Erreur lors de la création du format ${format.size}:`, err);
       }
     }
     
     if (createdFormats.length > 0) {
-      showAlert(`${createdFormats.length} formats par dÃ©faut ont Ã©tÃ© crÃ©Ã©s`, 'success');
+      showAlert(`${createdFormats.length} formats par défaut ont été créés`, 'success');
       
       // Ne recharger les formats que si l'élément DOM existe
       const formatSelect = document.getElementById('new-product-format');
@@ -217,16 +217,16 @@ async function createDefaultFormats() {
       }
     }
   } catch (error) {
-    console.error('Erreur lors de la crÃ©ation des formats par dÃ©faut:', error);
+    console.error('Erreur lors de la création des formats par défaut:', error);
   }
 }
 
-// Fonction pour ouvrir le modal de crÃ©ation de format
+// Fonction pour ouvrir le modal de création de format
 function openNewFormatModal() {
-  // VÃ©rifier si la fonction openFormatModal existe (dÃ©finie dans app.js)
+  // Vérifier si la fonction openFormatModal existe (définie dans app.js)
   if (typeof openFormatModal === 'function') {
-    // CrÃ©er un nouveau format sans produit spÃ©cifique
-    // OpenFormatModal sera mis Ã  jour pour gÃ©rer ce cas
+    // Créer un nouveau format sans produit spécifique
+    // OpenFormatModal sera mis À  jour pour gérer ce cas
     openFormatModal(null, null, true);
   } else {
     console.error('La fonction openFormatModal n\'existe pas');
@@ -234,20 +234,20 @@ function openNewFormatModal() {
   }
 }
 
-// Fonction pour crÃ©er un format directement si openFormatModal n'est pas disponible
+// Fonction pour créer un format directement si openFormatModal n'est pas disponible
 async function createFormatDirectly() {
-  // VÃ©rifier l'authentification avant de faire l'appel API
+  // Vérifier l'authentification avant de faire l'appel API
   if (!checkAuth()) {
-    console.log('Utilisateur non authentifiÃ©, crÃ©ation de format diffÃ©rÃ©e');
-    showAlert('Veuillez vous connecter pour crÃ©er un format', 'warning');
+    console.log('Utilisateur non authentifié, création de format différée');
+    showAlert('Veuillez vous connecter pour créer un format', 'warning');
     return;
   }
   
   const size = prompt('Taille du format (ex: 33cl, 75cl, 1L):');
   if (!size) return;
   
-  const units = ['cl', 'ml', 'L', 'bouteille', 'canette', 'unitÃ©'];
-  let unit = prompt(`UnitÃ© (${units.join(', ')}):`, 'cl');
+  const units = ['cl', 'ml', 'L', 'bouteille', 'canette', 'unité'];
+  let unit = prompt(`Unité (${units.join(', ')}):`, 'cl');
   if (!units.includes(unit)) unit = 'cl';
   
   const packagingOptions = ['bouteille', 'canette', 'verre', 'fut', 'bag-in-box', 'plastique'];
@@ -270,18 +270,18 @@ async function createFormatDirectly() {
     });
     
     if (result && result.success) {
-      showAlert(`Format ${size} (${packaging}) crÃ©Ã© avec succÃ¨s`, 'success');
+      showAlert(`Format ${size} (${packaging}) créé avec succès`, 'success');
       // Ne recharger les formats que si l'élément DOM existe
       const formatSelect = document.getElementById('new-product-format');
       if (formatSelect) {
         loadProductFormats();
       }
     } else {
-      showAlert('Erreur lors de la crÃ©ation du format', 'danger');
+      showAlert('Erreur lors de la création du format', 'danger');
     }
   } catch (error) {
-    console.error('Erreur lors de la crÃ©ation du format:', error);
-    showAlert('Erreur lors de la crÃ©ation du format', 'danger');
+    console.error('Erreur lors de la création du format:', error);
+    showAlert('Erreur lors de la création du format', 'danger');
   }
 }
 
@@ -290,14 +290,14 @@ async function addProductToBar(barId, productData) {
   console.log('Ajout de produit au bar:', { barId, productData });
   
   try {
-    // Rechercher si le produit existe dÃ©jÃ 
+    // Rechercher si le produit existe déjà 
     const productResponse = await fetchWithAuth(`/products?name=${encodeURIComponent(productData.name)}`);
-    console.log('RÃ©ponse de recherche de produit:', productResponse);
+    console.log('Réponse de recherche de produit:', productResponse);
     
     let productId;
     let productCreated = false;
     
-    // VÃ©rifier si le produit existe dÃ©jÃ 
+    // Vérifier si le produit existe déjà 
     if (productResponse && productResponse.success && productResponse.data.length > 0) {
       // Trouver une correspondance exacte
       const exactMatch = productResponse.data.find(p => 
@@ -309,7 +309,7 @@ async function addProductToBar(barId, productData) {
         console.log('Utilisation du produit existant, ID:', exactMatch.id);
         productId = exactMatch.id;
       } else {
-        // CrÃ©er un nouveau produit
+        // Créer un nouveau produit
         const newProductResponse = await fetchWithAuth('/products', {
           method: 'POST',
           body: JSON.stringify({
@@ -321,13 +321,13 @@ async function addProductToBar(barId, productData) {
         });
         
         if (newProductResponse && newProductResponse.success) {
-          console.log('Nouveau produit crÃ©Ã©:', newProductResponse);
+          console.log('Nouveau produit créé:', newProductResponse);
           productId = newProductResponse.data.id;
           productCreated = true;
         } else {
-          console.error('Erreur lors de la crÃ©ation du produit:', newProductResponse);
+          console.error('Erreur lors de la création du produit:', newProductResponse);
           try {
-            showAlert('Erreur lors de la crÃ©ation du produit', 'danger');
+            showAlert('Erreur lors de la création du produit', 'danger');
           } catch (alertError) {
             console.error('Erreur lors de l\'affichage de l\'alerte:', alertError);
           }
@@ -335,7 +335,7 @@ async function addProductToBar(barId, productData) {
         }
       }
     } else {
-      // CrÃ©er un nouveau produit
+      // Créer un nouveau produit
       const newProductResponse = await fetchWithAuth('/products', {
         method: 'POST',
         body: JSON.stringify({
@@ -347,13 +347,13 @@ async function addProductToBar(barId, productData) {
       });
       
       if (newProductResponse && newProductResponse.success) {
-        console.log('Nouveau produit crÃ©Ã©:', newProductResponse);
+        console.log('Nouveau produit créé:', newProductResponse);
         productId = newProductResponse.data.id;
         productCreated = true;
       } else {
-        console.error('Erreur lors de la crÃ©ation du produit:', newProductResponse);
+        console.error('Erreur lors de la création du produit:', newProductResponse);
         try {
-          showAlert('Erreur lors de la crÃ©ation du produit', 'danger');
+          showAlert('Erreur lors de la création du produit', 'danger');
         } catch (alertError) {
           console.error('Erreur lors de l\'affichage de l\'alerte:', alertError);
         }
@@ -361,12 +361,12 @@ async function addProductToBar(barId, productData) {
       }
     }
     
-    // Si aucun format n'est spÃ©cifiÃ© ou si un nouveau produit a Ã©tÃ© crÃ©Ã©, tenter de crÃ©er ou trouver un format appropriÃ©
+    // Si aucun format n'est spécifié ou si un nouveau produit a été créé, tenter de créer ou trouver un format approprié
     let formatId = productData.formatId;
     if (!formatId || productCreated) {
-      console.log('Recherche ou crÃ©ation d\'un format pour le produit');
+      console.log('Recherche ou création d\'un format pour le produit');
       
-      // Si un nouveau produit a Ã©tÃ© crÃ©Ã©, vÃ©rifier d'abord s'il existe dÃ©jÃ  des formats pour ce produit
+      // Si un nouveau produit a été créé, vérifier d'abord s'il existe déjà  des formats pour ce produit
       if (productCreated) {
         const productFormatsResponse = await fetchWithAuth(`/formats?productId=${productId}`);
         
@@ -374,15 +374,15 @@ async function addProductToBar(barId, productData) {
             productFormatsResponse.data && productFormatsResponse.data.length > 0) {
           // Utiliser le premier format existant
           formatId = productFormatsResponse.data[0].id;
-          console.log('Format existant trouvÃ© pour le nouveau produit:', formatId);
+          console.log('Format existant trouvé pour le nouveau produit:', formatId);
         }
       }
       
-      // Si aucun format n'est encore trouvÃ©, crÃ©er un nouveau format
+      // Si aucun format n'est encore trouvé, créer un nouveau format
       if (!formatId) {
-        console.log('CrÃ©ation d\'un nouveau format pour le produit');
+        console.log('Création d\'un nouveau format pour le produit');
         
-        // DÃ©terminer la taille et l'unitÃ© selon la catÃ©gorie du produit
+        // Déterminer la taille et l'unité selon la catégorie du produit
         let formatSize = '33cl';
         let formatVolume = 33;
         let formatUnit = 'cl';
@@ -409,7 +409,7 @@ async function addProductToBar(barId, productData) {
           }
         }
         
-        // CrÃ©er le format avec un lien direct vers le produit
+        // Créer le format avec un lien direct vers le produit
         const formatData = {
           productId: parseInt(productId),
           size: formatSize,
@@ -418,21 +418,21 @@ async function addProductToBar(barId, productData) {
           isActive: true
         };
         
-        console.log('CrÃ©ation du format avec les donnÃ©es:', formatData);
+        console.log('Création du format avec les données:', formatData);
         
         try {
-          // PremiÃ¨re tentative: crÃ©er le format avec productId
+          // Première tentative: créer le format avec productId
           const newFormatResponse = await fetchWithAuth('/formats', {
             method: 'POST',
             body: JSON.stringify(formatData)
           });
           
           if (newFormatResponse && newFormatResponse.success) {
-            console.log('Nouveau format crÃ©Ã© avec succÃ¨s:', newFormatResponse);
+            console.log('Nouveau format créé avec succès:', newFormatResponse);
             formatId = newFormatResponse.data.id;
           } else {
-            // Si la premiÃ¨re tentative Ã©choue, essayer sans productId puis associer
-            console.log('Ã‰chec de la crÃ©ation directe du format, tentative alternative');
+            // Si la première tentative échoue, essayer sans productId puis associer
+            console.log('À‰chec de la création directe du format, tentative alternative');
             
             const formatDataWithoutProduct = { ...formatData };
             delete formatDataWithoutProduct.productId;
@@ -455,23 +455,23 @@ async function addProductToBar(barId, productData) {
               
               if (updateResponse && updateResponse.success) {
                 formatId = altFormatId;
-                console.log('Format crÃ©Ã© et associÃ© avec succÃ¨s (mÃ©thode alternative)');
+                console.log('Format créé et associé avec succès (méthode alternative)');
               } else {
-                console.error('Ã‰chec de l\'association du format au produit');
-                // Continuer quand mÃªme, car le format existe, mais n'est pas associÃ©
+                console.error('À‰chec de l\'association du format au produit');
+                // Continuer quand même, car le format existe, mais n'est pas associé
                 formatId = altFormatId;
               }
             } else {
-              console.error('Ã‰chec de la crÃ©ation du format (mÃ©thode alternative)');
+              console.error('À‰chec de la création du format (méthode alternative)');
             }
           }
         } catch (formatError) {
-          console.error('Erreur lors de la crÃ©ation du format:', formatError);
+          console.error('Erreur lors de la création du format:', formatError);
         }
       }
     }
     
-    // VÃ©rifier que l'ID du format est valide
+    // Vérifier que l'ID du format est valide
     if (!formatId) {
       showAlert('Erreur: Format invalide', 'danger');
       return false;
@@ -486,7 +486,7 @@ async function addProductToBar(barId, productData) {
       idealQuantity: parseInt(productData.idealQuantity || '30')
     };
     
-    console.log('Ajout du stock avec les donnÃ©es:', stockData);
+    console.log('Ajout du stock avec les données:', stockData);
     
     let stockResponse;
     try {
@@ -495,19 +495,19 @@ async function addProductToBar(barId, productData) {
         body: JSON.stringify(stockData)
       });
     } catch (error) {
-      console.error('Erreur lors de la requÃªte d\'ajout de stock:', error);
+      console.error('Erreur lors de la requête d\'ajout de stock:', error);
       
       // En cas d'erreur, tenter d'ajouter le productId manuellement
       if (!stockResponse) {
         try {
           console.log('Tentative alternative d\'ajout de stock avec productId explicite');
-          // RÃ©cupÃ©rer les informations du format pour obtenir le productId
+          // Récupérer les informations du format pour obtenir le productId
           const formatResponse = await fetchWithAuth(`/formats/${formatId}`);
           if (formatResponse && formatResponse.success && formatResponse.data) {
             const productId = formatResponse.data.productId;
             
             if (productId) {
-              // Ajouter explicitement le productId dans les donnÃ©es de stock
+              // Ajouter explicitement le productId dans les données de stock
               stockData.productId = parseInt(productId);
               stockResponse = await fetchWithAuth('/stocks', {
                 method: 'POST',
@@ -521,18 +521,18 @@ async function addProductToBar(barId, productData) {
       }
     }
     
-    console.log('RÃ©ponse d\'ajout de stock:', stockResponse);
+    console.log('Réponse d\'ajout de stock:', stockResponse);
     
     if (stockResponse && stockResponse.success) {
-      // Mise Ã  jour de l'UI en temps rÃ©el traitÃ©e par les Ã©vÃ©nements socket.io
+      // Mise À  jour de l'UI en temps réel traitée par les événements socket.io
       try {
-        showAlert(`Produit ${productData.name} ajoutÃ© avec succÃ¨s`, 'success');
+        showAlert(`Produit ${productData.name} ajouté avec succès`, 'success');
       } catch (alertError) {
-        console.error('Erreur lors de l\'affichage de l\'alerte de succÃ¨s:', alertError);
-        // Ne pas interrompre l'exÃ©cution, le stock a Ã©tÃ© ajoutÃ© avec succÃ¨s
+        console.error('Erreur lors de l\'affichage de l\'alerte de succès:', alertError);
+        // Ne pas interrompre l'exécution, le stock a été ajouté avec succès
       }
       
-      // Recharger le tableau des stocks pour reflÃ©ter l'ajout
+      // Recharger le tableau des stocks pour refléter l'ajout
       if (typeof loadStocksTable === 'function') {
         setTimeout(() => {
           loadStocksTable(barId);
@@ -546,19 +546,19 @@ async function addProductToBar(barId, productData) {
         }, 500);
       }
       
-      // Recharger le tableau des produits Ã  recharger si disponible
+      // Recharger le tableau des produits À  recharger si disponible
       if (typeof loadRestockItems === 'function') {
         setTimeout(() => {
           // Tenter de recharger la page pour le bar actuel
           const savedBarId = localStorage.getItem('selectedBarId');
           if (savedBarId && (savedBarId === barId || !barId)) {
-            console.log('Actualisation forcÃ©e des produits Ã  recharger pour le bar:', savedBarId);
+            console.log('Actualisation forcée des produits À  recharger pour le bar:', savedBarId);
             loadRestockItems(savedBarId);
           }
         }, 700);
       }
       
-      // Force une actualisation complÃ¨te des stocks dans la page des stocks
+      // Force une actualisation complète des stocks dans la page des stocks
       if (typeof loadStocks === 'function') {
         setTimeout(() => {
           loadStocks();
@@ -579,11 +579,11 @@ async function addProductToBar(barId, productData) {
   }
 }
 
-// Mettre Ã  jour la quantitÃ© d'un produit
-async function updateProductQuantity(stockId, newQuantity, reason = 'Mise Ã  jour manuelle') {
-  console.log(`*** DEBUG: Fonction updateProductQuantity appelÃ©e pour le stock #${stockId} avec nouvelle quantitÃ© ${newQuantity}`);
+// Mettre À  jour la quantité d'un produit
+async function updateProductQuantity(stockId, newQuantity, reason = 'Mise À  jour manuelle') {
+  console.log(`*** DEBUG: Fonction updateProductQuantity appelée pour le stock #${stockId} avec nouvelle quantité ${newQuantity}`);
   try {
-    // VÃ©rifier que les valeurs sont valides
+    // Vérifier que les valeurs sont valides
     if (!stockId || isNaN(parseInt(stockId))) {
       console.error(`*** DEBUG: ID de stock invalide: ${stockId}`);
       showAlert('ID de stock invalide', 'danger');
@@ -591,34 +591,34 @@ async function updateProductQuantity(stockId, newQuantity, reason = 'Mise Ã  j
     }
     
     if (isNaN(parseInt(newQuantity)) || parseInt(newQuantity) < 0) {
-      console.error(`*** DEBUG: QuantitÃ© invalide: ${newQuantity}`);
-      showAlert('La quantitÃ© doit Ãªtre un nombre positif', 'warning');
+      console.error(`*** DEBUG: Quantité invalide: ${newQuantity}`);
+      showAlert('La quantité doit être un nombre positif', 'warning');
       return false;
     }
     
-    // Essayer d'abord la mÃ©thode simple
+    // Essayer d'abord la méthode simple
     let result = await tryUpdateStock('/stocks', stockId, newQuantity, reason);
-    console.log(`*** DEBUG: RÃ©sultat de la premiÃ¨re tentative: ${result}`);
+    console.log(`*** DEBUG: Résultat de la première tentative: ${result}`);
     
-    // Si cela Ã©choue, essayer l'endpoint historique
+    // Si cela échoue, essayer l'endpoint historique
     if (!result) {
-      console.log('*** DEBUG: Premier essai Ã©chouÃ©, tentative avec stock-history');
+      console.log('*** DEBUG: Premier essai échoué, tentative avec stock-history');
       result = await tryUpdateStock('/stock-history', stockId, newQuantity, reason);
-      console.log(`*** DEBUG: RÃ©sultat de la deuxiÃ¨me tentative: ${result}`);
+      console.log(`*** DEBUG: Résultat de la deuxième tentative: ${result}`);
     }
     
     return result;
   } catch (error) {
     console.error('*** DEBUG: Exception dans updateProductQuantity:', error);
-    showAlert(`Erreur lors de la mise Ã  jour de la quantitÃ©: ${error.message}`, 'danger');
+    showAlert(`Erreur lors de la mise À  jour de la quantité: ${error.message}`, 'danger');
     return false;
   }
 }
 
-// Fonction d'aide pour essayer diffÃ©rents endpoints de mise Ã  jour
+// Fonction d'aide pour essayer différents endpoints de mise À  jour
 async function tryUpdateStock(endpoint, stockId, newQuantity, reason) {
   try {
-    console.log(`*** DEBUG: Tentative de mise Ã  jour via l'endpoint: ${endpoint}`);
+    console.log(`*** DEBUG: Tentative de mise À  jour via l'endpoint: ${endpoint}`);
     
     const payload = {
       quantity: newQuantity,
@@ -631,7 +631,7 @@ async function tryUpdateStock(endpoint, stockId, newQuantity, reason) {
       payload.id = parseInt(stockId);
     }
     
-    console.log('*** DEBUG: DonnÃ©es de mise Ã  jour:', payload);
+    console.log('*** DEBUG: Données de mise À  jour:', payload);
     
     let url = endpoint;
     if (endpoint === '/stocks') {
@@ -641,12 +641,12 @@ async function tryUpdateStock(endpoint, stockId, newQuantity, reason) {
       const stockInfo = await fetchWithAuth(`/stocks/${stockId}`);
       console.log('*** DEBUG: Informations actuelles du stock:', stockInfo);
       
-      // Si on a pu rÃ©cupÃ©rer les infos du stock
+      // Si on a pu récupérer les infos du stock
       if (stockInfo && (stockInfo.success || stockInfo.id)) {
         const stock = stockInfo.data || stockInfo;
         const previousQuantity = stock.currentQuantity || 0;
         
-        // CrÃ©er un historique de stock
+        // Créer un historique de stock
         const historyData = {
           stockId: parseInt(stockId),
           previousQuantity: previousQuantity,
@@ -656,28 +656,28 @@ async function tryUpdateStock(endpoint, stockId, newQuantity, reason) {
           notes: reason
         };
         
-        console.log('*** DEBUG: DonnÃ©es d\'historique pour la mise Ã  jour:', historyData);
+        console.log('*** DEBUG: Données d\'historique pour la mise À  jour:', historyData);
         
         const historyResult = await fetchWithAuth('/stock-history', {
           method: 'POST',
           body: JSON.stringify(historyData)
         });
         
-        console.log('*** DEBUG: RÃ©ponse de crÃ©ation d\'historique:', historyResult);
+        console.log('*** DEBUG: Réponse de création d\'historique:', historyResult);
         
-        // En cas de succÃ¨s, actualiser aussi le tableau des produits Ã  recharger
+        // En cas de succès, actualiser aussi le tableau des produits À  recharger
         if (historyResult && historyResult.success) {
-          // RÃ©cupÃ©rer l'ID du bar depuis le stock
+          // Récupérer l'ID du bar depuis le stock
           if (stock.barId) {
             setTimeout(() => {
-              console.log('*** DEBUG: Actualisation du tableau des produits Ã  recharger aprÃ¨s mise Ã  jour');
+              console.log('*** DEBUG: Actualisation du tableau des produits À  recharger après mise À  jour');
               
-              // Utiliser d'abord le barId stockÃ© en localStorage, puis celui du stock
+              // Utiliser d'abord le barId stocké en localStorage, puis celui du stock
               const savedBarId = localStorage.getItem('selectedBarId');
               const barToUse = savedBarId || stock.barId;
               
-              // Toujours appeler loadRestockItems avec le barId appropriÃ©
-              console.log('*** DEBUG: Chargement des produits Ã  recharger pour le bar', barToUse);
+              // Toujours appeler loadRestockItems avec le barId approprié
+              console.log('*** DEBUG: Chargement des produits À  recharger pour le bar', barToUse);
               if (typeof loadRestockItems === 'function') {
                 loadRestockItems(barToUse);
               }
@@ -693,35 +693,35 @@ async function tryUpdateStock(endpoint, stockId, newQuantity, reason) {
       return false;
     }
     
-    // Envoyer la requÃªte de mise Ã  jour
+    // Envoyer la requête de mise À  jour
     const result = await fetchWithAuth(url, {
       method: 'PUT',
       body: JSON.stringify(payload)
     });
     
-    console.log(`*** DEBUG: RÃ©ponse de mise Ã  jour via ${url}:`, result);
+    console.log(`*** DEBUG: Réponse de mise À  jour via ${url}:`, result);
     
-    // VÃ©rifier si la requÃªte a rÃ©ussi
+    // Vérifier si la requête a réussi
     const success = !!(result && (result.success || result.id));
     
     if (success) {
-      showAlert('QuantitÃ© mise Ã  jour avec succÃ¨s', 'success');
+      showAlert('Quantité mise À  jour avec succès', 'success');
       
-      // RÃ©cupÃ©rer le barId pour actualiser la liste des produits Ã  recharger
+      // Récupérer le barId pour actualiser la liste des produits À  recharger
       try {
         const stockInfo = await fetchWithAuth(`/stocks/${stockId}`);
         if (stockInfo && (stockInfo.success || stockInfo.id)) {
           const stock = stockInfo.data || stockInfo;
           if (stock.barId) {
             setTimeout(() => {
-              console.log('*** DEBUG: Actualisation du tableau des produits Ã  recharger aprÃ¨s mise Ã  jour');
+              console.log('*** DEBUG: Actualisation du tableau des produits À  recharger après mise À  jour');
               
-              // Utiliser d'abord le barId stockÃ© en localStorage, puis celui du stock
+              // Utiliser d'abord le barId stocké en localStorage, puis celui du stock
               const savedBarId = localStorage.getItem('selectedBarId');
               const barToUse = savedBarId || stock.barId;
               
-              // Toujours appeler loadRestockItems avec le barId appropriÃ©
-              console.log('*** DEBUG: Chargement des produits Ã  recharger pour le bar', barToUse);
+              // Toujours appeler loadRestockItems avec le barId approprié
+              console.log('*** DEBUG: Chargement des produits À  recharger pour le bar', barToUse);
               if (typeof loadRestockItems === 'function') {
                 loadRestockItems(barToUse);
               }
@@ -729,12 +729,12 @@ async function tryUpdateStock(endpoint, stockId, newQuantity, reason) {
           }
         }
       } catch (error) {
-        console.error('*** DEBUG: Erreur lors de la rÃ©cupÃ©ration du barId:', error);
+        console.error('*** DEBUG: Erreur lors de la récupération du barId:', error);
       }
       
       return true;
     } else {
-      console.error('*** DEBUG: Ã‰chec de la mise Ã  jour:', result);
+      console.error('*** DEBUG: À‰chec de la mise À  jour:', result);
       return false;
     }
   } catch (error) {
@@ -743,7 +743,7 @@ async function tryUpdateStock(endpoint, stockId, newQuantity, reason) {
   }
 }
 
-// Fonction d'urgence pour rÃ©soudre le problÃ¨me de formats
+// Fonction d'urgence pour résoudre le problème de formats
 async function emergencyFormatFix() {
   // Vérifier l'authentification avant de faire l'appel API
   if (!checkAuth()) {
@@ -822,45 +822,45 @@ async function emergencyFormatFix() {
   }
 }
 
-// Initialiser les gestionnaires d'Ã©vÃ©nements
+// Initialiser les gestionnaires d'événements
 document.addEventListener('DOMContentLoaded', function() {
   // Protection contre les initialisations multiples
   if (stockManagerInitialized) {
-    console.log('Stock manager dÃ©jÃ  initialisÃ©, sortie...');
+    console.log('Stock manager déjà  initialisé, sortie...');
     return;
   }
   
   console.log('Initialisation du stock manager...');
   stockManagerInitialized = true;
   
-  // Ã‰couteur d'Ã©vÃ©nement pour le sÃ©lecteur de bar
+  // À‰couteur d'événement pour le sélecteur de bar
   const stockBarSelect = document.getElementById('stock-bar-select');
   
   if (stockBarSelect) {
     stockBarSelect.addEventListener('change', function() {
       const selectedBarId = this.value;
       
-      // Charger les stocks du bar sÃ©lectionnÃ©
+      // Charger les stocks du bar sélectionné
       loadStocksTable(selectedBarId);
       
-      // Charger le rÃ©capitulatif des produits Ã  recharger
+      // Charger le récapitulatif des produits À  recharger
       if (selectedBarId) {
         loadRestockSummary(selectedBarId);
       } else {
         const summaryContainer = document.getElementById('restock-summary-content');
         if (summaryContainer) {
-          summaryContainer.innerHTML = '<p class="text-muted">SÃ©lectionnez un bar pour voir les produits Ã  recharger.</p>';
+          summaryContainer.innerHTML = '<p class="text-muted">Sélectionnez un bar pour voir les produits À  recharger.</p>';
         }
       }
       
-      // Rejoindre la salle du bar pour les mises Ã  jour en temps rÃ©el
+      // Rejoindre la salle du bar pour les mises À  jour en temps réel
       if (selectedBarId) {
         joinBarRoom(selectedBarId);
       }
     });
   }
   
-  // Appliquer les amÃ©liorations Ã  l'interface des stocks
+  // Appliquer les améliorations À  l'interface des stocks
   const stocksPage = document.getElementById('stocks-page');
   
   if (stocksPage) {
@@ -868,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          // VÃ©rifier si la page est visible
+          // Vérifier si la page est visible
           if (!stocksPage.classList.contains('d-none')) {
             enhanceStockUI();
           }
@@ -878,23 +878,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     observer.observe(stocksPage, { attributes: true });
     
-    // VÃ©rifier Ã©galement lors du chargement initial
+    // Vérifier également lors du chargement initial
     if (!stocksPage.classList.contains('d-none')) {
       enhanceStockUI();
     }
   }
 });
 
-// Fonction pour ouvrir le modal de mise Ã  jour de stock alternative
+// Fonction pour ouvrir le modal de mise À  jour de stock alternative
 async function openAlternativeStockModal(stockId) {
   try {
     console.log(`Ouverture du modal alternatif pour le stock #${stockId}`);
     
-    // RÃ©cupÃ©rer les informations du stock
+    // Récupérer les informations du stock
     const stockInfo = await fetchWithAuth(`/stocks/${stockId}`);
-    console.log('Informations du stock pour mise Ã  jour alternative:', stockInfo);
+    console.log('Informations du stock pour mise À  jour alternative:', stockInfo);
     
-    // Extraire les informations nÃ©cessaires
+    // Extraire les informations nécessaires
     let stockData = null;
     let productName = 'Produit inconnu';
     let currentQuantity = 0;
@@ -930,7 +930,7 @@ async function openAlternativeStockModal(stockId) {
         }
       }
       
-      // Extraire la quantitÃ©
+      // Extraire la quantité
       if (stockData.quantity !== undefined) {
         currentQuantity = stockData.quantity;
       } else if (stockData.currentQuantity !== undefined) {
@@ -952,35 +952,35 @@ async function openAlternativeStockModal(stockId) {
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
       
-      // Ajouter le gestionnaire d'Ã©vÃ©nement pour le bouton de sauvegarde
+      // Ajouter le gestionnaire d'événement pour le bouton de sauvegarde
       const saveBtn = document.getElementById('save-alternative-stock-btn');
       if (saveBtn) {
-        // Supprimer les gestionnaires d'Ã©vÃ©nements existants
+        // Supprimer les gestionnaires d'événements existants
         const newSaveBtn = saveBtn.cloneNode(true);
         saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
         
         // Ajouter le nouveau gestionnaire
         newSaveBtn.addEventListener('click', async function() {
-          // DÃ©sactiver le bouton pendant le traitement
+          // Désactiver le bouton pendant le traitement
           this.disabled = true;
-          this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mise Ã  jour...';
+          this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mise À  jour...';
           
           const newQuantity = parseInt(document.getElementById('alternative-new-quantity').value);
           const reason = document.getElementById('alternative-reason').value;
           
           if (isNaN(newQuantity) || newQuantity < 0) {
-            showAlert('Veuillez entrer une quantitÃ© valide', 'warning');
+            showAlert('Veuillez entrer une quantité valide', 'warning');
             this.disabled = false;
-            this.textContent = 'Mettre Ã  jour';
+            this.textContent = 'Mettre À  jour';
             return;
           }
           
-          // Utiliser la fonction de mise Ã  jour via l'historique
+          // Utiliser la fonction de mise À  jour via l'historique
           const success = await updateProductQuantityViaHistory(stockId, newQuantity, reason);
           
           // Restaurer le bouton
           this.disabled = false;
-          this.textContent = 'Mettre Ã  jour';
+          this.textContent = 'Mettre À  jour';
           
           if (success) {
             // Fermer le modal
@@ -994,49 +994,49 @@ async function openAlternativeStockModal(stockId) {
         });
       }
     } else {
-      console.error('Modal de mise Ã  jour alternative non trouvÃ© dans le DOM');
-      showAlert('Erreur: Interface de mise Ã  jour alternative non disponible', 'danger');
+      console.error('Modal de mise À  jour alternative non trouvé dans le DOM');
+      showAlert('Erreur: Interface de mise À  jour alternative non disponible', 'danger');
     }
   } catch (error) {
     console.error('Erreur lors de l\'ouverture du modal alternatif:', error);
-    showAlert('Erreur lors de la prÃ©paration de la mise Ã  jour alternative', 'danger');
+    showAlert('Erreur lors de la préparation de la mise À  jour alternative', 'danger');
   }
 }
 
 // Fonction pour initialiser la connexion Socket.IO
 function initializeSocketConnection() {
   if (socket) {
-    // DÃ©jÃ  connectÃ©
+    // DéjÀ  connecté
     return;
   }
   
   // Connexion au serveur Socket.IO
   socket = io();
   
-  // Ã‰vÃ©nement de connexion
+  // À‰vénement de connexion
   socket.on('connect', () => {
-    console.log('Connexion Socket.IO Ã©tablie');
+    console.log('Connexion Socket.IO établie');
   });
   
-  // Ã‰vÃ©nement de dÃ©connexion
+  // À‰vénement de déconnexion
   socket.on('disconnect', () => {
     console.log('Connexion Socket.IO perdue');
   });
   
-  // Ã‰vÃ©nement de mise Ã  jour de stock
+  // À‰vénement de mise À  jour de stock
   socket.on('stock-updated', (updatedStock) => {
-    console.log('Mise Ã  jour de stock reÃ§ue:', updatedStock);
+    console.log('Mise À  jour de stock reçue:', updatedStock);
     updateStockInUI(updatedStock);
   });
   
-  // Ã‰vÃ©nement d'initialisation de stocks
+  // À‰vénement d'initialisation de stocks
   socket.on('stocks-initialized', (stocks) => {
-    console.log('Stocks initialisÃ©s reÃ§us:', stocks);
+    console.log('Stocks initialisés reçus:', stocks);
     updateMultipleStocksInUI(stocks);
   });
 }
 
-// Fonction pour rejoindre la salle d'un bar spÃ©cifique
+// Fonction pour rejoindre la salle d'un bar spécifique
 function joinBarRoom(barId) {
   if (!socket) {
     initializeSocketConnection();
@@ -1047,14 +1047,14 @@ function joinBarRoom(barId) {
   console.log(`Rejoint la salle du bar ${barId}`);
 }
 
-// Fonction pour mettre Ã  jour un stock dans l'interface utilisateur sans rechargement
+// Fonction pour mettre À  jour un stock dans l'interface utilisateur sans rechargement
 function updateStockInUI(updatedStock) {
-  console.log('Mise Ã  jour du stock dans l\'UI:', updatedStock);
+  console.log('Mise À  jour du stock dans l\'UI:', updatedStock);
   
   const stockRow = document.querySelector(`tr[data-stock-id="${updatedStock.id}"]`);
   
   if (stockRow) {
-    // Mettre Ã  jour les donnÃ©es dans la ligne existante
+    // Mettre À  jour les données dans la ligne existante
     const quantityCell = stockRow.querySelector('.stock-quantity-cell');
     const minQuantityCell = stockRow.querySelector('.min-quantity-cell');
     const idealQuantityCell = stockRow.querySelector('.ideal-quantity-cell');
@@ -1077,7 +1077,7 @@ function updateStockInUI(updatedStock) {
     }
     
     if (statusCell) {
-      // Mettre Ã  jour le statut du stock
+      // Mettre À  jour le statut du stock
       const status = updatedStock.currentQuantity < updatedStock.minQuantity ? 
                      'En dessous du minimum' : 
                      (updatedStock.currentQuantity < updatedStock.idealQuantity ? 
@@ -1091,30 +1091,30 @@ function updateStockInUI(updatedStock) {
       statusCell.innerHTML = `<span class="badge bg-${statusClass}">${status}</span>`;
     }
 
-    // Animer la ligne pour indiquer une mise Ã  jour
+    // Animer la ligne pour indiquer une mise À  jour
     stockRow.classList.add('highlight-update');
     setTimeout(() => {
       stockRow.classList.remove('highlight-update');
     }, 2000);
   } else {
     // Si la ligne n'existe pas, recharger le tableau complet
-    console.log('Ligne de stock non trouvÃ©e dans le DOM, rechargement du tableau');
+    console.log('Ligne de stock non trouvée dans le DOM, rechargement du tableau');
     try {
       const barSelect = document.getElementById('stock-bar-select');
       if (barSelect) {
         const selectedBarId = barSelect.value;
         
-        // VÃ©rifier si nous avons la fonction loadStocksTable
+        // Vérifier si nous avons la fonction loadStocksTable
         if (typeof loadStocksTable === 'function') {
           if (selectedBarId === updatedStock.barId.toString() || selectedBarId === '') {
-            // Recharger uniquement si le stock appartient au bar sÃ©lectionnÃ© ou si "Tous les bars" est sÃ©lectionnÃ©
+            // Recharger uniquement si le stock appartient au bar sélectionné ou si "Tous les bars" est sélectionné
             loadStocksTable(selectedBarId);
           }
         } else {
           console.warn('Fonction loadStocksTable non disponible');
         }
       } else {
-        console.warn('SÃ©lecteur de bar non trouvÃ© dans le DOM');
+        console.warn('Sélecteur de bar non trouvé dans le DOM');
       }
     } catch (error) {
       console.error('Erreur lors du rechargement du tableau des stocks:', error);
@@ -1122,40 +1122,40 @@ function updateStockInUI(updatedStock) {
   }
 }
 
-// Fonction pour mettre Ã  jour plusieurs stocks dans l'interface utilisateur
+// Fonction pour mettre À  jour plusieurs stocks dans l'interface utilisateur
 function updateMultipleStocksInUI(stocks) {
   if (!Array.isArray(stocks) || stocks.length === 0) return;
   
-  // Mettre Ã  jour chaque stock individuellement
+  // Mettre À  jour chaque stock individuellement
   stocks.forEach(stock => updateStockInUI(stock));
 }
 
 // Fonction pour ouvrir le modal d'initialisation de stock pour un bar
 function openInitializeStockModal(barId) {
-  console.log(`DÃ©but de l'initialisation des stocks pour le bar ${barId}`);
+  console.log(`Début de l'initialisation des stocks pour le bar ${barId}`);
   
-  // RÃ©cupÃ©rer les donnÃ©es du bar sÃ©lectionnÃ©
+  // Récupérer les données du bar sélectionné
   fetchWithAuth(`/bars/${barId}`)
     .then(barData => {
       if (!barData) {
-        console.error("Aucune donnÃ©e de bar reÃ§ue");
-        showAlert("Impossible de rÃ©cupÃ©rer les informations du bar", "danger");
+        console.error("Aucune donnée de bar reçue");
+        showAlert("Impossible de récupérer les informations du bar", "danger");
         return;
       }
       
       const bar = barData.data || barData;
-      console.log(`Bar rÃ©cupÃ©rÃ©:`, bar);
+      console.log(`Bar récupéré:`, bar);
       
-      // D'abord rÃ©cupÃ©rer tous les produits
+      // D'abord récupérer tous les produits
       fetchWithAuth('/products')
         .then(productsData => {
           const products = productsData?.data || productsData || [];
-          console.log(`Produits rÃ©cupÃ©rÃ©s (${products.length}):`, products);
+          console.log(`Produits récupérés (${products.length}):`, products);
           
-          // RÃ©cupÃ©rer tous les formats de produits disponibles
+          // Récupérer tous les formats de produits disponibles
           fetchWithAuth('/formats?include=product')
             .then(async (formatsData) => {
-              console.log(`RÃ©ponse brute de l'API formats:`, formatsData);
+              console.log(`Réponse brute de l'API formats:`, formatsData);
               
               let formats = [];
               
@@ -1168,15 +1168,15 @@ function openInitializeStockModal(barId) {
               console.log(`Formats extraits (${formats.length}):`, formats);
               
               if (!formats || formats.length === 0) {
-                showAlert("Aucun format de produit disponible. CrÃ©ez d'abord des formats pour vos produits.", "warning");
+                showAlert("Aucun format de produit disponible. Créez d'abord des formats pour vos produits.", "warning");
                 return;
               }
               
-              // RÃ©cupÃ©rer les stocks actuels pour ce bar
+              // Récupérer les stocks actuels pour ce bar
               const existingStocks = await loadBarStock(barId);
               console.log(`Stocks existants pour le bar (${existingStocks.length}):`, existingStocks);
               
-              // VÃ©rifier s'il y a des produits sans format
+              // Vérifier s'il y a des produits sans format
               const productsWithFormat = new Set();
               formats.forEach(format => {
                 if (format.Product) {
@@ -1189,7 +1189,7 @@ function openInitializeStockModal(barId) {
                   productsWithFormat.add(format.productId);
                   console.log(`Format avec productId: ID=${format.id}, productId=${format.productId}`);
                 } else {
-                  console.log(`Format sans produit associÃ©: ID=${format.id}, taille=${format.size || format.name}`);
+                  console.log(`Format sans produit associé: ID=${format.id}, taille=${format.size || format.name}`);
                 }
               });
               
@@ -1199,10 +1199,10 @@ function openInitializeStockModal(barId) {
               
               if (productsWithoutFormat.length > 0) {
                 const productNames = productsWithoutFormat.map(p => p.name).join(", ");
-                showAlert(`Les produits suivants n'ont pas de format et ne sont pas disponibles pour l'initialisation: ${productNames}. Ajoutez un format Ã  ces produits pour les inclure.`, "warning");
+                showAlert(`Les produits suivants n'ont pas de format et ne sont pas disponibles pour l'initialisation: ${productNames}. Ajoutez un format À  ces produits pour les inclure.`, "warning");
               }
               
-              // CrÃ©er et afficher le modal
+              // Créer et afficher le modal
               createStockInitializationModal(bar, formats, existingStocks);
             })
             .catch(error => {
@@ -1221,7 +1221,7 @@ function openInitializeStockModal(barId) {
     });
 }
 
-// Fonction pour obtenir le nom du produit Ã  partir du format
+// Fonction pour obtenir le nom du produit À  partir du format
 function getProductInfoFromFormat(format) {
   let productName = 'Produit inconnu';
   let productId = null;
@@ -1240,16 +1240,16 @@ function getProductInfoFromFormat(format) {
   return { productName, productId };
 }
 
-// Fonction pour crÃ©er et afficher le modal d'initialisation de stock
+// Fonction pour créer et afficher le modal d'initialisation de stock
 function createStockInitializationModal(bar, formats, existingStocks) {
-  console.log("CrÃ©ation du modal d'initialisation des stocks");
+  console.log("Création du modal d'initialisation des stocks");
   
-  // VÃ©rifier si le modal existe dÃ©jÃ , sinon le crÃ©er
+  // Vérifier si le modal existe déjà , sinon le créer
   let modalElement = document.getElementById('initialize-stock-modal');
   
   if (!modalElement) {
-    console.log("CrÃ©ation du DOM pour le modal d'initialisation");
-    // CrÃ©er le modal
+    console.log("Création du DOM pour le modal d'initialisation");
+    // Créer le modal
     const modalHTML = `
       <div class="modal fade" id="initialize-stock-modal" tabindex="-1" aria-labelledby="initialize-stock-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -1259,7 +1259,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <p class="text-muted">DÃ©finissez les quantitÃ©s actuelles et minimales pour les produits dans ce bar.</p>
+              <p class="text-muted">Définissez les quantités actuelles et minimales pour les produits dans ce bar.</p>
               
               <div class="mb-3 row">
                 <div class="col-md-6">
@@ -1269,8 +1269,8 @@ function createStockInitializationModal(bar, formats, existingStocks) {
                   </div>
                 </div>
                 <div class="col-md-6 text-end">
-                  <button type="button" class="btn btn-sm btn-outline-primary" id="select-all-products-btn">SÃ©lectionner tous</button>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" id="unselect-all-products-btn">DÃ©sÃ©lectionner tous</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary" id="select-all-products-btn">Sélectionner tous</button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="unselect-all-products-btn">Désélectionner tous</button>
                 </div>
               </div>
               
@@ -1284,13 +1284,13 @@ function createStockInitializationModal(bar, formats, existingStocks) {
                         <th style="width: 50px;"><input type="checkbox" id="toggle-all-products" checked></th>
                         <th>Produit</th>
                         <th>Format</th>
-                        <th>QuantitÃ© actuelle</th>
-                        <th>QuantitÃ© minimale</th>
-                        <th>QuantitÃ© idÃ©ale</th>
+                        <th>Quantité actuelle</th>
+                        <th>Quantité minimale</th>
+                        <th>Quantité idéale</th>
                       </tr>
                     </thead>
                     <tbody id="initialize-stock-tbody">
-                      <!-- Les lignes seront ajoutÃ©es dynamiquement -->
+                      <!-- Les lignes seront ajoutées dynamiquement -->
                     </tbody>
                   </table>
                 </div>
@@ -1298,7 +1298,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-              <button type="button" class="btn btn-primary" id="save-all-stocks-btn">Enregistrer les stocks sÃ©lectionnÃ©s</button>
+              <button type="button" class="btn btn-primary" id="save-all-stocks-btn">Enregistrer les stocks sélectionnés</button>
             </div>
           </div>
         </div>
@@ -1317,50 +1317,50 @@ function createStockInitializationModal(bar, formats, existingStocks) {
   
   // Filtrer les formats sans produit
   const validFormats = formats.filter(format => {
-    // Si le format a dÃ©jÃ  un produit chargÃ© (via include=product), l'utiliser
+    // Si le format a déjà  un produit chargé (via include=product), l'utiliser
     if (format.Product || format.product) {
       return true;
     }
     
-    // Si le format a un productId mais pas d'objet Product associÃ© dans la rÃ©ponse API
+    // Si le format a un productId mais pas d'objet Product associé dans la réponse API
     if (format.productId) {
-      console.log(`Format avec productId mais sans Product chargÃ©: ID=${format.id}, productId=${format.productId}`);
-      // Essayer de rechercher le produit correspondant Ã  cet ID
+      console.log(`Format avec productId mais sans Product chargé: ID=${format.id}, productId=${format.productId}`);
+      // Essayer de rechercher le produit correspondant À  cet ID
       const matchingProduct = products.find(p => p.id == format.productId);
       if (matchingProduct) {
-        console.log(`Produit correspondant trouvÃ© pour format ${format.id}: ${matchingProduct.name}`);
+        console.log(`Produit correspondant trouvé pour format ${format.id}: ${matchingProduct.name}`);
         // Ajouter manuellement le produit au format
         format.Product = matchingProduct;
         return true;
       } else {
-        console.log(`Aucun produit trouvÃ© avec ID ${format.productId} pour le format ${format.id}`);
+        console.log(`Aucun produit trouvé avec ID ${format.productId} pour le format ${format.id}`);
       }
-      return true; // Inclure ce format mÃªme si le produit n'est pas trouvÃ©
+      return true; // Inclure ce format même si le produit n'est pas trouvé
     }
     
     // Filtrer les formats sans productId
     return false;
   });
   
-  console.log(`Formats valides avec produits associÃ©s: ${validFormats.length}/${formats.length}`);
+  console.log(`Formats valides avec produits associés: ${validFormats.length}/${formats.length}`);
   
   if (validFormats.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="6" class="text-center">
           <div class="alert alert-warning">
-            Aucun format avec produit associÃ© n'a Ã©tÃ© trouvÃ©. Veuillez d'abord crÃ©er des produits et leur associer des formats.
+            Aucun format avec produit associé n'a été trouvé. Veuillez d'abord créer des produits et leur associer des formats.
           </div>
         </td>
       </tr>
     `;
-    // Afficher quand mÃªme le modal
+    // Afficher quand même le modal
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
     return;
   }
   
-  // Compter combien de produits uniques sont reprÃ©sentÃ©s dans les formats
+  // Compter combien de produits uniques sont représentés dans les formats
   const uniqueProducts = new Set();
   validFormats.forEach(format => {
     if (format.Product) uniqueProducts.add(format.Product.id);
@@ -1374,10 +1374,10 @@ function createStockInitializationModal(bar, formats, existingStocks) {
     // Obtenir les informations du produit
     const { productName, productId } = getProductInfoFromFormat(format);
     
-    // VÃ©rifier si ce format a dÃ©jÃ  un stock pour ce bar
+    // Vérifier si ce format a déjà  un stock pour ce bar
     let existingStock = null;
     try {
-      // VÃ©rifier que existingStocks est bien un tableau
+      // Vérifier que existingStocks est bien un tableau
       if (Array.isArray(existingStocks)) {
         existingStock = existingStocks.find(stock => 
           stock.formatId === format.id || 
@@ -1390,7 +1390,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
     
     console.log(`Ajout de la ligne pour: ${productName}, format: ${format.name || format.size}, stock existant: ${existingStock ? 'oui' : 'non'}, productId: ${productId}`);
     
-    // Valeurs par dÃ©faut ou existantes
+    // Valeurs par défaut ou existantes
     const currentQuantity = existingStock ? (existingStock.currentQuantity || 0) : 0;
     const minQuantity = existingStock ? (existingStock.minQuantity || 10) : 10;
     const idealQuantity = existingStock ? (existingStock.idealQuantity || 30) : 30;
@@ -1400,7 +1400,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
     row.setAttribute('data-product-id', productId);
     row.setAttribute('data-product-name', productName);
     
-    // Pour les Ã©lÃ©ments existants, sÃ©lectionner par dÃ©faut
+    // Pour les éléments existants, sélectionner par défaut
     const isChecked = existingStock ? 'checked' : 'checked';
     
     row.innerHTML = `
@@ -1429,7 +1429,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
   if (tbody.children.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="text-center">Aucun produit avec format n'a Ã©tÃ© trouvÃ©</td>
+        <td colspan="6" class="text-center">Aucun produit avec format n'a été trouvé</td>
       </tr>
     `;
   }
@@ -1452,7 +1452,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
     });
   }
   
-  // Gestionnaire pour le checkbox "sÃ©lectionner tout"
+  // Gestionnaire pour le checkbox "sélectionner tout"
   const toggleAllCheckbox = document.getElementById('toggle-all-products');
   if (toggleAllCheckbox) {
     toggleAllCheckbox.addEventListener('change', function() {
@@ -1463,7 +1463,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
     });
   }
   
-  // Boutons de sÃ©lection/dÃ©sÃ©lection
+  // Boutons de sélection/désélection
   const selectAllBtn = document.getElementById('select-all-products-btn');
   if (selectAllBtn) {
     selectAllBtn.addEventListener('click', function() {
@@ -1486,7 +1486,7 @@ function createStockInitializationModal(bar, formats, existingStocks) {
     });
   }
   
-  // Ajouter l'Ã©vÃ©nement pour sauvegarder tous les stocks
+  // Ajouter l'événement pour sauvegarder tous les stocks
   const saveButton = document.getElementById('save-all-stocks-btn');
   if (saveButton) {
     saveButton.addEventListener('click', async function() {
@@ -1495,14 +1495,14 @@ function createStockInitializationModal(bar, formats, existingStocks) {
       
       try {
         await saveAllStocks(bar.id);
-        // Fermer le modal aprÃ¨s la sauvegarde
+        // Fermer le modal après la sauvegarde
         const modal = bootstrap.Modal.getInstance(modalElement);
         modal.hide();
       } catch (error) {
         console.error('Erreur lors de la sauvegarde des stocks:', error);
       } finally {
         this.disabled = false;
-        this.textContent = 'Enregistrer les stocks sÃ©lectionnÃ©s';
+        this.textContent = 'Enregistrer les stocks sélectionnés';
       }
     });
   }
@@ -1511,32 +1511,32 @@ function createStockInitializationModal(bar, formats, existingStocks) {
   const modal = new bootstrap.Modal(modalElement);
   modal.show();
   
-  // Rejoindre la salle du bar pour les mises Ã  jour en temps rÃ©el
+  // Rejoindre la salle du bar pour les mises À  jour en temps réel
   joinBarRoom(bar.id);
 }
 
 // Fonction pour sauvegarder tous les stocks
 async function saveAllStocks(barId) {
   try {
-    // RÃ©cupÃ©rer toutes les lignes de stock
+    // Récupérer toutes les lignes de stock
     const rows = document.querySelectorAll('#initialize-stock-tbody tr');
     const stocks = [];
     let selectedCount = 0;
     
-    console.log(`PrÃ©paration de l'initialisation des stocks pour ${rows.length} lignes`);
+    console.log(`Préparation de l'initialisation des stocks pour ${rows.length} lignes`);
     
     rows.forEach(row => {
       const formatId = row.getAttribute('data-format-id');
       const productId = row.getAttribute('data-product-id');
       
-      // VÃ©rifier si la ligne est sÃ©lectionnÃ©e
+      // Vérifier si la ligne est sélectionnée
       const checkbox = row.querySelector(`.product-select-checkbox[data-format-id="${formatId}"]`);
       if (!checkbox || !checkbox.checked) {
-        console.log(`Ligne pour format ${formatId} non sÃ©lectionnÃ©e, ignorÃ©e`);
-        return; // Ignorer les lignes non sÃ©lectionnÃ©es
+        console.log(`Ligne pour format ${formatId} non sélectionnée, ignorée`);
+        return; // Ignorer les lignes non sélectionnées
       }
       
-      // RÃ©cupÃ©rer les quantitÃ©s pour les lignes sÃ©lectionnÃ©es
+      // Récupérer les quantités pour les lignes sélectionnées
       const currentQuantityInput = row.querySelector(`.init-current-quantity[data-format-id="${formatId}"]`);
       const minQuantityInput = row.querySelector(`.init-min-quantity[data-format-id="${formatId}"]`);
       const idealQuantityInput = row.querySelector(`.init-ideal-quantity[data-format-id="${formatId}"]`);
@@ -1560,7 +1560,7 @@ async function saveAllStocks(barId) {
         
         stocks.push(stockItem);
         
-        console.log(`PrÃ©parÃ© stock pour format ${formatId}, produit ${productId}, quantitÃ© ${currentQuantity}`);
+        console.log(`Préparé stock pour format ${formatId}, produit ${productId}, quantité ${currentQuantity}`);
         selectedCount++;
       } else {
         console.error(`Inputs manquants pour le format ${formatId}`);
@@ -1568,12 +1568,12 @@ async function saveAllStocks(barId) {
     });
     
     if (stocks.length === 0) {
-      showAlert('Aucun produit sÃ©lectionnÃ© Ã  enregistrer', 'warning');
+      showAlert('Aucun produit sélectionné À  enregistrer', 'warning');
       return;
     }
     
     console.log(`Tentative d'initialisation de ${stocks.length} stocks pour le bar #${barId}`);
-    console.log('DonnÃ©es Ã  envoyer:', { stocks });
+    console.log('Données À  envoyer:', { stocks });
     
     // Appeler l'API pour initialiser tous les stocks
     const result = await fetchWithAuth(`/stocks/initialize/${barId}`, {
@@ -1581,16 +1581,16 @@ async function saveAllStocks(barId) {
       body: JSON.stringify({ stocks })
     });
     
-    console.log('RÃ©sultat de l\'initialisation des stocks:', result);
+    console.log('Résultat de l\'initialisation des stocks:', result);
     
     if (!result) {
       showAlert('Erreur lors de l\'initialisation des stocks', 'danger');
       return;
     }
     
-    // Plan de secours en cas d'Ã©chec de l'initialisation groupÃ©e
+    // Plan de secours en cas d'échec de l'initialisation groupée
     if (!result.success) {
-      console.log("Ã‰chec de l'initialisation groupÃ©e, tentative d'initialisation individuelle");
+      console.log("À‰chec de l'initialisation groupée, tentative d'initialisation individuelle");
       
       let successCount = 0;
       let errorCount = 0;
@@ -1614,10 +1614,10 @@ async function saveAllStocks(barId) {
           });
           
           if (stockResult && stockResult.success) {
-            console.log(`Stock ajoutÃ© avec succÃ¨s pour format ${stock.formatId}`);
+            console.log(`Stock ajouté avec succès pour format ${stock.formatId}`);
             successCount++;
           } else {
-            console.error(`Ã‰chec de l'ajout du stock pour format ${stock.formatId}:`, stockResult);
+            console.error(`À‰chec de l'ajout du stock pour format ${stock.formatId}:`, stockResult);
             errorCount++;
           }
         } catch (e) {
@@ -1627,7 +1627,7 @@ async function saveAllStocks(barId) {
       }
       
       if (successCount > 0) {
-        showAlert(`${successCount} produits ont Ã©tÃ© initialisÃ©s individuellement, ${errorCount} Ã©checs`, errorCount > 0 ? 'warning' : 'success');
+        showAlert(`${successCount} produits ont été initialisés individuellement, ${errorCount} échecs`, errorCount > 0 ? 'warning' : 'success');
         
         // Recharger les stocks
         const stockBarSelect = document.getElementById('stock-bar-select');
@@ -1637,7 +1637,7 @@ async function saveAllStocks(barId) {
         
         return true;
       } else {
-        showAlert(`Ã‰chec de l'initialisation de tous les stocks`, 'danger');
+        showAlert(`À‰chec de l'initialisation de tous les stocks`, 'danger');
         return false;
       }
     }
@@ -1645,14 +1645,14 @@ async function saveAllStocks(barId) {
     const successCount = result.data.length;
     const errorCount = result.errors ? result.errors.length : 0;
     
-    let message = `${successCount} produits ont Ã©tÃ© initialisÃ©s avec succÃ¨s`;
+    let message = `${successCount} produits ont été initialisés avec succès`;
     if (errorCount > 0) {
       message += `, mais ${errorCount} erreurs sont survenues`;
     }
     
     showAlert(message, errorCount > 0 ? 'warning' : 'success');
     
-    // Recharger les stocks pour le bar sÃ©lectionnÃ©
+    // Recharger les stocks pour le bar sélectionné
     const stockBarSelect = document.getElementById('stock-bar-select');
     if (stockBarSelect && stockBarSelect.value === barId.toString()) {
       await loadStocksTable(barId);
@@ -1666,18 +1666,18 @@ async function saveAllStocks(barId) {
   }
 }
 
-// Mettre Ã  jour l'interface pour les stocks
+// Mettre À  jour l'interface pour les stocks
 function enhanceStockUI() {
   // Ajouter un bouton pour initialiser tous les stocks
   const stockBarSelect = document.getElementById('stock-bar-select');
   
   if (stockBarSelect) {
-    // VÃ©rifier si le bouton existe dÃ©jÃ 
+    // Vérifier si le bouton existe déjà 
     if (!document.getElementById('initialize-all-stocks-btn')) {
       const barSelectContainer = stockBarSelect.parentElement;
       
       if (barSelectContainer) {
-        // CrÃ©er un groupe de formulaire horizontal
+        // Créer un groupe de formulaire horizontal
         barSelectContainer.className = 'col-md-6 d-flex align-items-end';
         
         // Ajouter le bouton d'initialisation
@@ -1689,12 +1689,12 @@ function enhanceStockUI() {
         
         barSelectContainer.insertAdjacentHTML('beforeend', btnHTML);
         
-        // Ajouter l'Ã©vÃ©nement au bouton
+        // Ajouter l'événement au bouton
         document.getElementById('initialize-all-stocks-btn').addEventListener('click', function() {
           const selectedBarId = stockBarSelect.value;
           
           if (!selectedBarId) {
-            showAlert('Veuillez sÃ©lectionner un bar pour initialiser les stocks', 'warning');
+            showAlert('Veuillez sélectionner un bar pour initialiser les stocks', 'warning');
             return;
           }
           
@@ -1703,13 +1703,13 @@ function enhanceStockUI() {
       }
     }
     
-    // Ajouter une section pour le rÃ©capitulatif des produits Ã  recharger et le bouton de fin de service
+    // Ajouter une section pour le récapitulatif des produits À  recharger et le bouton de fin de service
     if (!document.getElementById('restock-summary-section') && !document.getElementById('end-shift-global-btn')) {
       const stocksPage = document.getElementById('stocks-page');
       const stocksTable = document.querySelector('#stocks-page .table-responsive');
       
       if (stocksPage && stocksTable) {
-        // Ajouter un bouton de fin de service global aprÃ¨s le tableau des stocks
+        // Ajouter un bouton de fin de service global après le tableau des stocks
         const endShiftBtnContainer = document.createElement('div');
         endShiftBtnContainer.className = 'text-end mt-4';
         endShiftBtnContainer.innerHTML = `
@@ -1718,54 +1718,54 @@ function enhanceStockUI() {
           </button>
         `;
         
-        // Ajouter le bouton aprÃ¨s le tableau
+        // Ajouter le bouton après le tableau
         stocksTable.parentNode.insertBefore(endShiftBtnContainer, stocksTable.nextSibling);
         
-        // Ajouter l'Ã©vÃ©nement au bouton
+        // Ajouter l'événement au bouton
         document.getElementById('end-shift-global-btn').addEventListener('click', function() {
           const selectedBarId = stockBarSelect.value;
           
           if (!selectedBarId) {
-            showAlert('Veuillez sÃ©lectionner un bar pour enregistrer une fin de service', 'warning');
+            showAlert('Veuillez sélectionner un bar pour enregistrer une fin de service', 'warning');
             return;
           }
           
           openGlobalShiftModal(selectedBarId);
         });
         
-        // Ajouter une section pour le rÃ©capitulatif des produits Ã  recharger
+        // Ajouter une section pour le récapitulatif des produits À  recharger
         const restockSummarySection = document.createElement('div');
         restockSummarySection.className = 'card mt-4';
         restockSummarySection.id = 'restock-summary-section';
         restockSummarySection.innerHTML = `
           <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Produits Ã  recharger</h5>
+            <h5 class="mb-0">Produits À  recharger</h5>
             <button type="button" class="btn btn-sm btn-outline-primary" id="refresh-restock-summary-btn">
               <i class="bi bi-arrow-clockwise"></i> Actualiser
             </button>
           </div>
           <div class="card-body">
             <div id="restock-summary-content">
-              <p class="text-muted">SÃ©lectionnez un bar pour voir les produits Ã  recharger.</p>
+              <p class="text-muted">Sélectionnez un bar pour voir les produits À  recharger.</p>
             </div>
           </div>
         `;
         
-        // Ajouter la section aprÃ¨s le bouton de fin de service
+        // Ajouter la section après le bouton de fin de service
         endShiftBtnContainer.parentNode.insertBefore(restockSummarySection, endShiftBtnContainer.nextSibling);
         
-        // Ajouter l'Ã©vÃ©nement au bouton d'actualisation
+        // Ajouter l'événement au bouton d'actualisation
         document.getElementById('refresh-restock-summary-btn').addEventListener('click', function() {
           const selectedBarId = stockBarSelect.value;
           
           if (selectedBarId) {
             loadRestockSummary(selectedBarId);
           } else {
-            showAlert('Veuillez sÃ©lectionner un bar pour voir les produits Ã  recharger', 'warning');
+            showAlert('Veuillez sélectionner un bar pour voir les produits À  recharger', 'warning');
           }
         });
         
-        // Si un bar est dÃ©jÃ  sÃ©lectionnÃ©, charger le rÃ©capitulatif
+        // Si un bar est déjà  sélectionné, charger le récapitulatif
         if (stockBarSelect.value) {
           loadRestockSummary(stockBarSelect.value);
         }
@@ -1787,15 +1787,15 @@ function enhanceStockUI() {
     }
   });
   
-  // Ajouter des classes aux cellules pour faciliter les mises Ã  jour
+  // Ajouter des classes aux cellules pour faciliter les mises À  jour
   stockRows.forEach(row => {
     const cells = row.querySelectorAll('td');
     
-    // Ajouter des classes aux cellules appropriÃ©es (en supposant l'ordre des colonnes)
-    if (cells.length >= 5) { // Produit, Format, QuantitÃ© actuelle, QuantitÃ© minimale, QuantitÃ© idÃ©ale, Statut, Actions
-      const quantityCell = cells[3]; // Index 3 pour la quantitÃ© actuelle
-      const minQuantityCell = cells[4]; // Index 4 pour la quantitÃ© minimale
-      const idealQuantityCell = cells[5]; // Index 5 pour la quantitÃ© idÃ©ale
+    // Ajouter des classes aux cellules appropriées (en supposant l'ordre des colonnes)
+    if (cells.length >= 5) { // Produit, Format, Quantité actuelle, Quantité minimale, Quantité idéale, Statut, Actions
+      const quantityCell = cells[3]; // Index 3 pour la quantité actuelle
+      const minQuantityCell = cells[4]; // Index 4 pour la quantité minimale
+      const idealQuantityCell = cells[5]; // Index 5 pour la quantité idéale
       
       if (quantityCell) quantityCell.classList.add('stock-quantity-cell');
       if (minQuantityCell) minQuantityCell.classList.add('min-quantity-cell');
@@ -1811,45 +1811,45 @@ function enhanceStockUI() {
   // Initialiser la connexion Socket.IO
   initializeSocketConnection();
   
-  // Rejoindre la salle du bar sÃ©lectionnÃ©
+  // Rejoindre la salle du bar sélectionné
   const selectedBarId = stockBarSelect ? stockBarSelect.value : null;
   if (selectedBarId) {
     joinBarRoom(selectedBarId);
   }
 }
 
-// Charger le rÃ©capitulatif des produits Ã  recharger
+// Charger le récapitulatif des produits À  recharger
 async function loadRestockSummary(barId) {
-  console.log('Fonction loadRestockSummary appelÃ©e pour le bar', barId);
+  console.log('Fonction loadRestockSummary appelée pour le bar', barId);
   
-  // RÃ©cupÃ©rer le conteneur du rÃ©sumÃ© au lieu du tableau principal
+  // Récupérer le conteneur du résumé au lieu du tableau principal
   const restockSummaryContent = document.getElementById('restock-summary-content');
   
   if (!restockSummaryContent) {
-    console.error('Ã‰lÃ©ment restock-summary-content non trouvÃ©');
+    console.error('À‰lément restock-summary-content non trouvé');
     return;
   }
   
   // Afficher un indicateur de chargement
-  restockSummaryContent.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm" role="status"></div> Chargement des produits Ã  recharger...</div>';
+  restockSummaryContent.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm" role="status"></div> Chargement des produits À  recharger...</div>';
   
   try {
-    // RÃ©cupÃ©rer les informations du bar
+    // Récupérer les informations du bar
     const barResponse = await fetchWithAuth(`/bars/${barId}`);
     
     if (!barResponse || !barResponse.success) {
-      console.error('Ã‰chec de rÃ©cupÃ©ration des informations du bar');
+      console.error('À‰chec de récupération des informations du bar');
       restockSummaryContent.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des informations du bar</div>';
       return;
     }
     
     const bar = barResponse.data;
     
-    // RÃ©cupÃ©rer tous les stocks du bar
+    // Récupérer tous les stocks du bar
     const stocksResponse = await fetchWithAuth(`/stocks?barId=${barId}`);
     
     if (!stocksResponse || !stocksResponse.success) {
-      console.error('Ã‰chec de rÃ©cupÃ©ration des stocks');
+      console.error('À‰chec de récupération des stocks');
       restockSummaryContent.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des stocks</div>';
       return;
     }
@@ -1858,12 +1858,12 @@ async function loadRestockSummary(barId) {
     
     // S'il n'y a pas de stocks
     if (allStocks.length === 0) {
-      restockSummaryContent.innerHTML = '<div class="alert alert-info">Aucun produit n\'est enregistrÃ© dans ce bar</div>';
+      restockSummaryContent.innerHTML = '<div class="alert alert-info">Aucun produit n\'est enregistré dans ce bar</div>';
       return;
     }
     
     let html = '<table class="table table-sm"><thead><tr>' +
-               '<th>Produit</th><th>Format</th><th>QuantitÃ©</th><th>QuantitÃ© plein</th><th>A recharger</th>' +
+               '<th>Produit</th><th>Format</th><th>Quantité</th><th>Quantité plein</th><th>A recharger</th>' +
                '</tr></thead><tbody>';
     
     let totalToOrder = 0;
@@ -1878,30 +1878,30 @@ async function loadRestockSummary(barId) {
       const product = stock.Format.Product;
       const format = stock.Format;
       
-      // S'assurer que les valeurs sont des nombres ou 0 par dÃ©faut
+      // S'assurer que les valeurs sont des nombres ou 0 par défaut
       const currentQuantity = (stock.currentQuantity !== undefined && stock.currentQuantity !== null) 
                               ? stock.currentQuantity : 0;
       const idealQuantity = (stock.idealQuantity !== undefined && stock.idealQuantity !== null) 
                           ? stock.idealQuantity : 30;
       
-      // Nouvelle logique pour calculer la quantitÃ© Ã  recharger
+      // Nouvelle logique pour calculer la quantité À  recharger
       let toOrder = 0;
       if (currentQuantity === 0) {
-        // Si quantitÃ© actuelle est 0, recharger la quantitÃ© plein
+        // Si quantité actuelle est 0, recharger la quantité plein
         toOrder = idealQuantity;
       } else {
-        // Sinon, recharger la diffÃ©rence entre plein et actuelle
+        // Sinon, recharger la différence entre plein et actuelle
         toOrder = Math.max(0, idealQuantity - currentQuantity);
       }
       
-      // DÃ©terminer la classe CSS selon le niveau de stock
+      // Déterminer la classe CSS selon le niveau de stock
       let rowClass = '';
       if (toOrder > 0) {
         totalToOrder += toOrder;
         productsToRestock++;
-        rowClass = 'table-warning'; // Produit sous le seuil idÃ©al
+        rowClass = 'table-warning'; // Produit sous le seuil idéal
       } else if (currentQuantity >= idealQuantity) {
-        rowClass = 'table-success'; // Produit bien approvisionnÃ©
+        rowClass = 'table-success'; // Produit bien approvisionné
       }
       
       html += `
@@ -1915,11 +1915,11 @@ async function loadRestockSummary(barId) {
       `;
     });
     
-    // Ajouter une ligne de total si des produits sont Ã  recharger
+    // Ajouter une ligne de total si des produits sont À  recharger
     if (totalToOrder > 0) {
       html += `
         <tr class="table-primary">
-          <td colspan="4" class="text-end"><strong>Total Ã  recharger:</strong></td>
+          <td colspan="4" class="text-end"><strong>Total À  recharger:</strong></td>
           <td><strong>${totalToOrder}</strong></td>
         </tr>
       `;
@@ -1931,12 +1931,12 @@ async function loadRestockSummary(barId) {
     const statusHTML = `
       <div class="alert ${productsToRestock > 0 ? 'alert-warning' : 'alert-success'} mt-2">
         ${productsToRestock > 0 ? 
-          `<i class="bi bi-exclamation-triangle me-2"></i>${productsToRestock} produit(s) Ã  recharger sur ${allStocks.length} produits au total` : 
-          `<i class="bi bi-check-circle me-2"></i>Tous les ${allStocks.length} produits sont Ã  niveau`}
+          `<i class="bi bi-exclamation-triangle me-2"></i>${productsToRestock} produit(s) À  recharger sur ${allStocks.length} produits au total` : 
+          `<i class="bi bi-check-circle me-2"></i>Tous les ${allStocks.length} produits sont À  niveau`}
       </div>
     `;
     
-    // Mettre Ã  jour le contenu
+    // Mettre À  jour le contenu
     restockSummaryContent.innerHTML = html + statusHTML;
     
   } catch (error) {
@@ -1948,7 +1948,7 @@ async function loadRestockSummary(barId) {
 // Ouvrir le modal pour enregistrer une fin de service globale
 async function openGlobalShiftModal(barId) {
   try {
-    // RÃ©cupÃ©rer les informations du bar
+    // Récupérer les informations du bar
     const barResponse = await fetchWithAuth(`/bars/${barId}`);
     
     if (!barResponse || !barResponse.success) {
@@ -1958,11 +1958,11 @@ async function openGlobalShiftModal(barId) {
     
     const bar = barResponse.data;
     
-    // CrÃ©er le modal de fin de service globale s'il n'existe pas
+    // Créer le modal de fin de service globale s'il n'existe pas
     let modalElement = document.getElementById('global-shift-modal');
     
     if (!modalElement) {
-      // CrÃ©er le modal
+      // Créer le modal
       const modalHTML = `
         <div class="modal fade" id="global-shift-modal" tabindex="-1">
           <div class="modal-dialog modal-lg">
@@ -2002,12 +2002,12 @@ async function openGlobalShiftModal(barId) {
                             </div>
                           </th>
                           <th>Format</th>
-                          <th>QuantitÃ© actuelle</th>
-                          <th>Nouvelle quantitÃ©</th>
+                          <th>Quantité actuelle</th>
+                          <th>Nouvelle quantité</th>
                         </tr>
                       </thead>
                       <tbody id="global-shift-tbody">
-                        <!-- Les lignes seront ajoutÃ©es dynamiquement -->
+                        <!-- Les lignes seront ajoutées dynamiquement -->
                       </tbody>
                     </table>
                   </div>
@@ -2031,16 +2031,16 @@ async function openGlobalShiftModal(barId) {
     const globalShiftDateInput = document.getElementById('global-shift-date');
     const globalShiftTbody = document.getElementById('global-shift-tbody');
     
-    // RÃ©initialiser le formulaire
+    // Réinitialiser le formulaire
     const form = document.getElementById('global-shift-form');
     if (form) form.reset();
     
-    // DÃ©finir l'ID du bar
+    // Définir l'ID du bar
     if (globalShiftBarIdInput) {
       globalShiftBarIdInput.value = barId;
     }
     
-    // DÃ©finir la date du jour
+    // Définir la date du jour
     if (globalShiftDateInput) {
       const today = new Date();
       const formattedDate = today.toISOString().split('T')[0];
@@ -2064,7 +2064,7 @@ async function openGlobalShiftModal(barId) {
     const stocks = stocksResponse.data || [];
     
     if (stocks.length === 0) {
-      showAlert('Aucun stock trouvÃ© pour ce bar', 'warning');
+      showAlert('Aucun stock trouvé pour ce bar', 'warning');
       return;
     }
     
@@ -2102,7 +2102,7 @@ async function openGlobalShiftModal(barId) {
         globalShiftTbody.appendChild(row);
       });
       
-      // Ajouter l'Ã©vÃ©nement pour la case Ã  cocher "SÃ©lectionner tout"
+      // Ajouter l'événement pour la case À  cocher "Sélectionner tout"
       const selectAllCheckbox = document.getElementById('select-all-products-shift');
       if (selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', function() {
@@ -2114,22 +2114,22 @@ async function openGlobalShiftModal(barId) {
       }
     }
     
-    // Ajouter l'Ã©vÃ©nement pour le bouton de sauvegarde
+    // Ajouter l'événement pour le bouton de sauvegarde
     const saveButton = document.getElementById('save-global-shift-btn');
     console.log('*** DEBUG: Bouton save-global-shift-btn dans openGlobalShiftModal:', !!saveButton);
     
     if (saveButton) {
-      // Supprimer l'ancien gestionnaire d'Ã©vÃ©nement s'il existe
+      // Supprimer l'ancien gestionnaire d'événement s'il existe
       const newSaveButton = saveButton.cloneNode(true);
       saveButton.parentNode.replaceChild(newSaveButton, saveButton);
-      console.log('*** DEBUG: Ancien gestionnaire supprimÃ©, nouveau bouton crÃ©Ã©');
+      console.log('*** DEBUG: Ancien gestionnaire supprimé, nouveau bouton créé');
       
-      // Ajouter le nouveau gestionnaire d'Ã©vÃ©nement
+      // Ajouter le nouveau gestionnaire d'événement
       newSaveButton.addEventListener('click', function(e) {
-        console.log('*** DEBUG: Bouton Save cliquÃ©!', e);
+        console.log('*** DEBUG: Bouton Save cliqué!', e);
         saveGlobalShift();
       });
-      console.log('*** DEBUG: Nouveau gestionnaire d\'Ã©vÃ©nement ajoutÃ©');
+      console.log('*** DEBUG: Nouveau gestionnaire d\'événement ajouté');
     }
     
     // Afficher le modal
@@ -2145,7 +2145,7 @@ async function openGlobalShiftModal(barId) {
 async function saveGlobalShift() {
   console.log('Sauvegarde de la fin de service global');
   try {
-    // DÃ©sactiver le bouton de sauvegarde
+    // Désactiver le bouton de sauvegarde
     const saveButton = document.getElementById('save-global-shift-btn');
     
     if (saveButton) {
@@ -2153,7 +2153,7 @@ async function saveGlobalShift() {
       saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
     }
     
-    // RÃ©cupÃ©rer les valeurs du formulaire
+    // Récupérer les valeurs du formulaire
     const barId = document.getElementById('global-shift-bar-id').value;
     const shiftDate = document.getElementById('global-shift-date').value;
     const shiftName = document.getElementById('global-shift-name').value;
@@ -2169,7 +2169,7 @@ async function saveGlobalShift() {
       return;
     }
     
-    // RÃ©cupÃ©rer tous les stocks modifiÃ©s
+    // Récupérer tous les stocks modifiés
     const stockRows = document.querySelectorAll('#global-shift-table tbody tr');
     const selectedStocks = [];
     
@@ -2182,7 +2182,7 @@ async function saveGlobalShift() {
         const newQuantityInput = row.querySelector('.new-quantity');
         const newQuantity = newQuantityInput ? parseInt(newQuantityInput.value) : 0;
         
-        // VÃ©rifier si la nouvelle quantitÃ© est diffÃ©rente de l'ancienne
+        // Vérifier si la nouvelle quantité est différente de l'ancienne
         if (newQuantity !== undefined && !isNaN(newQuantity)) {
           selectedStocks.push({
             stockId,
@@ -2193,9 +2193,9 @@ async function saveGlobalShift() {
       }
     });
     
-    // VÃ©rifier qu'au moins un stock est sÃ©lectionnÃ©
+    // Vérifier qu'au moins un stock est sélectionné
     if (selectedStocks.length === 0) {
-      showAlert('Veuillez sÃ©lectionner au moins un produit', 'warning');
+      showAlert('Veuillez sélectionner au moins un produit', 'warning');
       if (saveButton) {
         saveButton.disabled = false;
         saveButton.textContent = 'Enregistrer le service';
@@ -2203,7 +2203,7 @@ async function saveGlobalShift() {
       return;
     }
     
-    // Utiliser la mÃ©thode de sauvegarde individuelle
+    // Utiliser la méthode de sauvegarde individuelle
     const result = await saveGlobalShiftIndividually(
       barId,
       shiftDate,
@@ -2219,25 +2219,25 @@ async function saveGlobalShift() {
         modal.hide();
       }
       
-      // Recharger les donnÃ©es
+      // Recharger les données
       setTimeout(() => {
-        console.log('Actualisation des donnÃ©es aprÃ¨s sauvegarde');
+        console.log('Actualisation des données après sauvegarde');
         loadStocksTable(barId);
         
-        // Actualiser aussi le tableau des produits Ã  recharger sur le dashboard
+        // Actualiser aussi le tableau des produits À  recharger sur le dashboard
         const savedBarId = localStorage.getItem('selectedBarId');
         if (savedBarId) {
-          console.log('Actualisation des produits Ã  recharger pour bar:', savedBarId);
+          console.log('Actualisation des produits À  recharger pour bar:', savedBarId);
           loadRestockItems(savedBarId);
         }
         
-        // Actualiser le rÃ©sumÃ© des produits Ã  recharger dans la page des stocks
-        console.log('Actualisation du rÃ©sumÃ© des produits Ã  recharger pour bar:', barId);
+        // Actualiser le résumé des produits À  recharger dans la page des stocks
+        console.log('Actualisation du résumé des produits À  recharger pour bar:', barId);
         loadRestockSummary(barId);
-      }, 1000); // Attendre un peu plus longtemps pour s'assurer que les mises Ã  jour sont terminÃ©es
+      }, 1000); // Attendre un peu plus longtemps pour s'assurer que les mises À  jour sont terminées
     }
     
-    // RÃ©activer le bouton
+    // Réactiver le bouton
     if (saveButton) {
       saveButton.disabled = false;
       saveButton.textContent = 'Enregistrer le service';
@@ -2246,7 +2246,7 @@ async function saveGlobalShift() {
     console.error('Exception dans saveGlobalShift:', error);
     showAlert('Erreur lors de l\'enregistrement de la fin de service: ' + error.message, 'danger');
     
-    // RÃ©activer le bouton en cas d'erreur
+    // Réactiver le bouton en cas d'erreur
     const saveButton = document.getElementById('save-global-shift-btn');
     if (saveButton) {
       saveButton.disabled = false;
@@ -2255,19 +2255,19 @@ async function saveGlobalShift() {
   }
 }
 
-// MÃ©thode de secours pour enregistrer les stocks individuellement
+// Méthode de secours pour enregistrer les stocks individuellement
 async function saveGlobalShiftIndividually(barId, shiftDate, shiftName, notes, selectedStocks) {
-  console.log('*** DEBUG: Fonction saveGlobalShiftIndividually appelÃ©e avec', selectedStocks.length, 'stocks');
+  console.log('*** DEBUG: Fonction saveGlobalShiftIndividually appelée avec', selectedStocks.length, 'stocks');
   
   try {
     let successCount = 0;
     let failureCount = 0;
     
     for (const stock of selectedStocks) {
-      // ProcÃ©der avec la mise Ã  jour, mÃªme si la quantitÃ© n'a pas changÃ©
+      // Procéder avec la mise À  jour, même si la quantité n'a pas changé
       console.log(`*** DEBUG: Traitement du stock #${stock.stockId}: ${stock.previousQuantity} -> ${stock.newQuantity}`);
       
-      // Construire les donnÃ©es pour ce stock
+      // Construire les données pour ce stock
       const stockHistoryData = {
         stockId: stock.stockId,
         barId: parseInt(barId),
@@ -2278,21 +2278,21 @@ async function saveGlobalShiftIndividually(barId, shiftDate, shiftName, notes, s
         notes
       };
       
-      console.log('*** DEBUG: DonnÃ©es Ã  envoyer pour ce stock:', stockHistoryData);
+      console.log('*** DEBUG: Données À  envoyer pour ce stock:', stockHistoryData);
       
-      // Envoyer la requÃªte
+      // Envoyer la requête
       try {
         const response = await fetchWithAuth('/stock-history', {
           method: 'POST',
           body: JSON.stringify(stockHistoryData)
         });
         
-        console.log(`*** DEBUG: RÃ©ponse pour le stock #${stock.stockId}:`, response);
+        console.log(`*** DEBUG: Réponse pour le stock #${stock.stockId}:`, response);
         
         if (response && response.success) {
           successCount++;
           
-          // Mise Ã  jour supplÃ©mentaire du stock lui-mÃªme pour s'assurer que la quantitÃ© est correcte
+          // Mise À  jour supplémentaire du stock lui-même pour s'assurer que la quantité est correcte
           try {
             const stockUpdateResponse = await fetchWithAuth(`/stocks/${stock.stockId}`, {
               method: 'PUT',
@@ -2301,14 +2301,14 @@ async function saveGlobalShiftIndividually(barId, shiftDate, shiftName, notes, s
               })
             });
             
-            console.log(`*** DEBUG: Mise Ã  jour directe du stock #${stock.stockId}:`, stockUpdateResponse);
+            console.log(`*** DEBUG: Mise À  jour directe du stock #${stock.stockId}:`, stockUpdateResponse);
           } catch (updateError) {
-            console.error(`*** DEBUG: Erreur lors de la mise Ã  jour directe du stock #${stock.stockId}:`, updateError);
+            console.error(`*** DEBUG: Erreur lors de la mise À  jour directe du stock #${stock.stockId}:`, updateError);
           }
         } else {
           failureCount++;
           console.error(`*** DEBUG: Erreur lors de l'enregistrement de l'historique pour le stock #${stock.stockId}:`, 
-                        response?.message || 'RÃ©ponse non valide');
+                        response?.message || 'Réponse non valide');
         }
       } catch (stockError) {
         failureCount++;
@@ -2316,18 +2316,18 @@ async function saveGlobalShiftIndividually(barId, shiftDate, shiftName, notes, s
       }
     }
     
-    console.log(`*** DEBUG: RÃ©sultat final: ${successCount} succÃ¨s, ${failureCount} Ã©checs`);
+    console.log(`*** DEBUG: Résultat final: ${successCount} succès, ${failureCount} échecs`);
     
-    // Afficher le rÃ©sultat
+    // Afficher le résultat
     if (failureCount === 0 && successCount > 0) {
-      showAlert(`Fin de service enregistrÃ©e avec succÃ¨s pour ${successCount} produits`, 'success');
-      return { success: true, message: `${successCount} produits mis Ã  jour` };
+      showAlert(`Fin de service enregistrée avec succès pour ${successCount} produits`, 'success');
+      return { success: true, message: `${successCount} produits mis À  jour` };
     } else if (successCount > 0) {
-      showAlert(`Fin de service partiellement enregistrÃ©e: ${successCount} produits mis Ã  jour, ${failureCount} Ã©checs`, 'warning');
-      return { success: true, partial: true, message: `${successCount} produits mis Ã  jour, ${failureCount} Ã©checs` };
+      showAlert(`Fin de service partiellement enregistrée: ${successCount} produits mis À  jour, ${failureCount} échecs`, 'warning');
+      return { success: true, partial: true, message: `${successCount} produits mis À  jour, ${failureCount} échecs` };
     } else {
-      showAlert('Aucun produit n\'a pu Ãªtre mis Ã  jour', 'danger');
-      return { success: false, message: 'Aucun produit mis Ã  jour' };
+      showAlert('Aucun produit n\'a pu être mis À  jour', 'danger');
+      return { success: false, message: 'Aucun produit mis À  jour' };
     }
   } catch (error) {
     console.error('*** DEBUG: Exception globale dans saveGlobalShiftIndividually:', error);
